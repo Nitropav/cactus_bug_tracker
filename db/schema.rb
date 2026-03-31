@@ -10,9 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_30_193300) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_31_154600) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "ticket_comments", force: :cascade do |t|
+    t.bigint "ticket_id", null: false
+    t.bigint "author_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_ticket_comments_on_author_id"
+    t.index ["ticket_id"], name: "index_ticket_comments_on_ticket_id"
+  end
+
+  create_table "ticket_events", force: :cascade do |t|
+    t.bigint "ticket_id", null: false
+    t.bigint "actor_id"
+    t.string "event_type", null: false
+    t.text "message", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_ticket_events_on_actor_id"
+    t.index ["event_type"], name: "index_ticket_events_on_event_type"
+    t.index ["ticket_id"], name: "index_ticket_events_on_ticket_id"
+  end
 
   create_table "ticket_gate_ones", force: :cascade do |t|
     t.bigint "ticket_id", null: false
@@ -72,6 +95,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_30_193300) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "ticket_comments", "tickets"
+  add_foreign_key "ticket_comments", "users", column: "author_id"
+  add_foreign_key "ticket_events", "tickets"
+  add_foreign_key "ticket_events", "users", column: "actor_id"
   add_foreign_key "ticket_gate_ones", "tickets"
   add_foreign_key "ticket_gate_twos", "tickets"
   add_foreign_key "tickets", "users", column: "assigned_to_id"

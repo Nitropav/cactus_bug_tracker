@@ -1,70 +1,102 @@
 <% content_for :title, @ticket.title %>
 
 <main class="page">
-  <div class="page-header">
+  <section class="hero-banner hero-banner--ticket">
     <div>
+      <div class="hero-banner__eyebrow">Ticket <%= "BT-#{@ticket.id.to_s.rjust(4, '0')}" %></div>
       <h1><%= @ticket.title %></h1>
       <p class="page-subtitle"><%= @ticket.summary.presence || "No summary has been added yet." %></p>
-    </div>
-    <div class="page-header__actions">
-      <%= link_to "All tickets", tickets_path, class: "button button--secondary" %>
-      <%= link_to "Edit ticket", edit_ticket_path(@ticket), class: "button" %>
-      <%= button_to "Delete ticket", ticket_path(@ticket), method: :delete, form: { data: { turbo_confirm: "Delete this ticket?" } }, class: "button button--secondary" %>
-    </div>
-  </div>
 
-  <section class="surface">
-    <div class="detail-grid">
-      <div class="detail-card">
-        <h2>Lifecycle</h2>
-        <dl class="detail-list">
-          <dt>Status</dt>
-          <dd><span class="status-pill status-pill--<%= @ticket.status %>"><%= @ticket.display_status %></span></dd>
-          <dt>Severity</dt>
-          <dd><span class="severity-pill severity-pill--<%= @ticket.severity %>"><%= @ticket.display_severity %></span></dd>
-          <dt>Domain</dt>
-          <dd><%= @ticket.domain.humanize %></dd>
-          <dt>External reference</dt>
-          <dd><%= @ticket.external_reference.presence || "None" %></dd>
-        </dl>
+      <div class="hero-banner__meta">
+        <span class="status-pill status-pill--<%= @ticket.status %>"><%= @ticket.display_status %></span>
+        <span class="severity-pill severity-pill--<%= @ticket.severity %>"><%= @ticket.display_severity %></span>
+        <span class="mini-ticket__domain"><%= @ticket.domain.humanize %></span>
+        <span class="mini-ticket__domain">External: <%= @ticket.external_reference.presence || "None" %></span>
+      </div>
+    </div>
+
+    <div class="hero-banner__actions hero-banner__actions--stacked">
+      <div class="ticket-show__stats">
+        <div class="ticket-show__stat">
+          <span>Reporter</span>
+          <strong><%= @ticket.reported_by.name %></strong>
+        </div>
+        <div class="ticket-show__stat">
+          <span>Assignee</span>
+          <strong><%= @ticket.assigned_to&.name || "Unassigned" %></strong>
+        </div>
+        <div class="ticket-show__stat">
+          <span>Updated</span>
+          <strong><%= time_ago_in_words(@ticket.updated_at) %> ago</strong>
+        </div>
       </div>
 
-      <div class="detail-card">
-        <h2>Ownership</h2>
-        <dl class="detail-list">
-          <dt>Reported by</dt>
-          <dd><%= @ticket.reported_by.name %> (<%= @ticket.reported_by.display_role %>)</dd>
-          <dt>Assigned to</dt>
-          <dd><%= @ticket.assigned_to ? "#{@ticket.assigned_to.name} (#{@ticket.assigned_to.display_role})" : "Unassigned" %></dd>
-          <dt>Created</dt>
-          <dd><%= @ticket.created_at.strftime("%Y-%m-%d %H:%M") %></dd>
-          <dt>Updated</dt>
-          <dd><%= @ticket.updated_at.strftime("%Y-%m-%d %H:%M") %></dd>
-        </dl>
+      <div class="page-header__actions">
+        <%= link_to "All tickets", tickets_path, class: "button button--secondary" %>
+        <%= link_to "Edit ticket", edit_ticket_path(@ticket), class: "button" %>
+        <%= button_to "Delete ticket", ticket_path(@ticket), method: :delete, form: { data: { turbo_confirm: "Delete this ticket?" } }, class: "button button--secondary" %>
       </div>
     </div>
   </section>
 
-  <section class="detail-grid" style="margin-top: 1rem;">
-    <article class="detail-card">
-      <h2>Gate 1</h2>
-      <p class="gate-state <%= @ticket.gate_one_complete? ? "gate-state--complete" : "gate-state--pending" %>">
-        <%= @ticket.gate_one_complete? ? "Complete" : "Pending" %>
-      </p>
-      <p class="detail-muted">
-        Reporter completeness gate. This section will hold problem description, repro steps, expected vs actual behavior,
-        and environment context.
-      </p>
+  <section class="detail-grid detail-grid--three-up" style="margin-top: 1rem;">
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Lifecycle</div>
+      <h2>Workflow state</h2>
+      <dl class="detail-list">
+        <dt>Status</dt>
+        <dd><span class="status-pill status-pill--<%= @ticket.status %>"><%= @ticket.display_status %></span></dd>
+        <dt>Severity</dt>
+        <dd><span class="severity-pill severity-pill--<%= @ticket.severity %>"><%= @ticket.display_severity %></span></dd>
+        <dt>Domain</dt>
+        <dd><%= @ticket.domain.humanize %></dd>
+        <dt>External reference</dt>
+        <dd><%= @ticket.external_reference.presence || "None" %></dd>
+      </dl>
     </article>
 
-    <article class="detail-card">
-      <h2>Gate 2</h2>
-      <p class="gate-state <%= @ticket.gate_two_complete? ? "gate-state--complete" : "gate-state--pending" %>">
-        <%= @ticket.gate_two_complete? ? "Complete" : "Pending" %>
-      </p>
-      <p class="detail-muted">
-        Developer resolution gate. This section will hold root cause, fix summary, verification steps, and commit linkage.
-      </p>
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Ownership</div>
+      <h2>People</h2>
+      <dl class="detail-list">
+        <dt>Reported by</dt>
+        <dd><%= @ticket.reported_by.name %> (<%= @ticket.reported_by.display_role %>)</dd>
+        <dt>Assigned to</dt>
+        <dd><%= @ticket.assigned_to ? "#{@ticket.assigned_to.name} (#{@ticket.assigned_to.display_role})" : "Unassigned" %></dd>
+        <dt>Created</dt>
+        <dd><%= @ticket.created_at.strftime("%Y-%m-%d %H:%M") %></dd>
+        <dt>Updated</dt>
+        <dd><%= @ticket.updated_at.strftime("%Y-%m-%d %H:%M") %></dd>
+      </dl>
     </article>
+
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Gate readiness</div>
+      <h2>Completion state</h2>
+      <div class="ticket-health">
+        <div class="ticket-health__row">
+          <span class="gate-state <%= @ticket.gate_one_complete? ? "gate-state--complete" : "gate-state--pending" %>">Gate 1 <%= @ticket.gate_one_complete? ? "Complete" : "Pending" %></span>
+          <span class="detail-muted"><%= @ticket.gate_one.completed_at ? @ticket.gate_one.completed_at.strftime("%Y-%m-%d %H:%M") : "Reporter input still missing" %></span>
+        </div>
+        <div class="ticket-health__row">
+          <span class="gate-state <%= @ticket.gate_two_complete? ? "gate-state--complete" : "gate-state--pending" %>">Gate 2 <%= @ticket.gate_two_complete? ? "Complete" : "Pending" %></span>
+          <span class="detail-muted"><%= @ticket.gate_two.completed_at ? @ticket.gate_two.completed_at.strftime("%Y-%m-%d %H:%M") : "Developer resolution still missing" %></span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="detail-grid detail-grid--stacked ticket-section-gap">
+    <%= render "gate_one_form", ticket: @ticket %>
+    <%= render "gate_two_form", ticket: @ticket %>
+  </section>
+
+  <section class="detail-grid ticket-section-gap">
+    <%= render "comment_form", ticket: @ticket, new_comment: @new_comment %>
+    <%= render "events_list", ticket: @ticket %>
+  </section>
+
+  <section id="comments" class="detail-grid detail-grid--stacked ticket-section-gap">
+    <%= render "comments_list", ticket: @ticket %>
   </section>
 </main>

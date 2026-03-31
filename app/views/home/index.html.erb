@@ -1,36 +1,124 @@
 <% content_for :title, "Cactus Bug Tracker" %>
 
-<main class="page">
-  <h1 style="margin-bottom: 0.5rem;">Cactus Bug Tracker</h1>
-  <p style="margin-top: 0; color: #555;">
-    Initial Rails skeleton is ready. Core ticketing models and Docker development setup are in place.
-  </p>
+<main class="page page--dashboard">
+  <section class="hero-banner">
+    <div>
+      <div class="hero-banner__eyebrow">Engineering workspace</div>
+      <h1>Cactus Bug Tracker</h1>
+      <p class="page-subtitle">
+        A focused operational workflow for bug triage, structured gates, and training-quality resolution records.
+      </p>
+    </div>
 
-  <section style="margin-top: 2rem;">
-    <h2 style="font-size: 1.1rem;">Current Day 1 Scope</h2>
-    <ul>
-      <li><code>User</code> with role enum and password support</li>
-      <li><code>Ticket</code> with status, severity, and ownership</li>
-      <li><code>TicketGateOne</code> for reporter completeness</li>
-      <li><code>TicketGateTwo</code> for developer resolution completeness</li>
-      <li>Docker Compose development stack with PostgreSQL</li>
-    </ul>
-  </section>
-
-  <section style="margin-top: 2rem;">
-    <h2 style="font-size: 1.1rem;">Ticket Snapshot</h2>
-    <div class="stats-grid">
-      <% @ticket_counts.each do |status, count| %>
-        <article class="stat-card">
-          <strong><%= status.to_s.humanize %></strong>
-          <div><%= count %></div>
-        </article>
-      <% end %>
+    <div class="hero-banner__actions">
+      <%= link_to "Open tickets", tickets_path, class: "button" %>
+      <%= link_to "Create ticket", new_ticket_path, class: "button button--secondary" %>
     </div>
   </section>
 
-  <section style="margin-top: 2rem;">
-    <%= link_to "Open tickets", tickets_path, class: "button" %>
-    <%= link_to "Create ticket", new_ticket_path, class: "button button--secondary" %>
+  <section class="content-grid">
+    <article class="surface surface--soft">
+      <div class="section-heading">
+        <h2>Ticket snapshot</h2>
+        <p>Current ticket counts by workflow stage.</p>
+      </div>
+
+      <div class="stats-grid">
+        <% @ticket_counts.each do |status, count| %>
+          <article class="stat-card">
+            <span class="stat-card__label"><%= status.to_s.humanize %></span>
+            <div class="stat-card__value"><%= count %></div>
+          </article>
+        <% end %>
+      </div>
+    </article>
+
+    <article class="surface surface--soft">
+      <div class="section-heading">
+        <h2>Current scope</h2>
+        <p>What is already live in the first implementation pass.</p>
+      </div>
+
+      <ul class="feature-list">
+        <li><code>User</code> accounts with role-based login</li>
+        <li><code>Ticket</code> CRUD with ownership and lifecycle fields</li>
+        <li><code>Gate 1</code> and <code>Gate 2</code> inline editing</li>
+        <li>Comments and event timeline on every ticket</li>
+        <li>Docker-based local development stack</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="surface surface--soft">
+      <div class="section-heading">
+        <h2>Recent tickets</h2>
+        <p>The latest tickets being edited or moved through workflow stages.</p>
+      </div>
+
+      <% if @recent_tickets.any? %>
+        <div class="mini-ticket-list">
+          <% @recent_tickets.each do |ticket| %>
+            <%= link_to ticket_path(ticket), class: "mini-ticket" do %>
+              <div class="mini-ticket__header">
+                <div>
+                  <div class="mini-ticket__title"><%= ticket.title %></div>
+                  <div class="mini-ticket__subtitle"><%= ticket.summary.presence || "No summary yet" %></div>
+                </div>
+                <div class="mini-ticket__age"><%= time_ago_in_words(ticket.updated_at) %> ago</div>
+              </div>
+
+              <div class="mini-ticket__meta">
+                <span class="status-pill status-pill--<%= ticket.status %>"><%= ticket.display_status %></span>
+                <span class="severity-pill severity-pill--<%= ticket.severity %>"><%= ticket.display_severity %></span>
+                <span class="mini-ticket__domain"><%= ticket.domain.humanize %></span>
+              </div>
+
+              <div class="mini-ticket__footer">
+                <span>Reporter: <strong><%= ticket.reported_by.name %></strong></span>
+                <span>Assignee: <strong><%= ticket.assigned_to&.name || "Unassigned" %></strong></span>
+                <span>Gate 1: <strong><%= ticket.gate_one_complete? ? "Complete" : "Pending" %></strong></span>
+                <span>Gate 2: <strong><%= ticket.gate_two_complete? ? "Complete" : "Pending" %></strong></span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state empty-state--compact">
+          <h2>No recent tickets</h2>
+          <p>Create the first ticket to start generating workflow history.</p>
+        </div>
+      <% end %>
+    </article>
+
+    <article class="surface surface--soft">
+      <div class="section-heading">
+        <h2>Recent activity</h2>
+        <p>Latest ticket actions across the workspace.</p>
+      </div>
+
+      <% if @recent_events.any? %>
+        <div class="activity-feed">
+          <% @recent_events.each do |event| %>
+            <%= link_to ticket_path(event.ticket), class: "activity-item" do %>
+              <div class="activity-item__meta">
+                <strong><%= event.actor&.name || "System" %></strong>
+                <span><%= time_ago_in_words(event.created_at) %> ago</span>
+              </div>
+              <div class="activity-item__title">
+                <span><%= event.event_type.humanize %></span>
+                <span class="activity-item__ticket">#<%= event.ticket.id %> <%= event.ticket.title %></span>
+              </div>
+              <div class="activity-item__message"><%= truncate(event.message, length: 140) %></div>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state empty-state--compact">
+          <h2>No activity yet</h2>
+          <p>Ticket events will appear here once the team starts using the workflow.</p>
+        </div>
+      <% end %>
+    </article>
   </section>
 </main>

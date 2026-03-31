@@ -1,28 +1,45 @@
 <% content_for :title, "Sign in" %>
 
 <main class="auth-page">
-  <section class="auth-card">
-    <h1>Sign in</h1>
-    <p class="auth-card__subtitle">Use one of the seeded project accounts or a manually created user.</p>
+  <section class="auth-hero">
+    <div class="auth-hero__copy">
+      <div class="auth-hero__eyebrow">Structured issue operations</div>
+      <h1>Track bugs like work, not like loose notes.</h1>
+      <p>
+        Capture Gate 1, Gate 2, ownership, and verified resolution history in a clean workflow designed for engineering teams.
+      </p>
 
-    <%= form_with url: session_path, method: :post, class: "auth-form" do |form| %>
-      <div class="field">
-        <%= form.label :email %>
-        <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true %>
+      <div class="auth-hero__chips">
+        <span>Ticket workflow</span>
+        <span>Training-ready data</span>
+        <span>Developer resolution gates</span>
       </div>
+    </div>
 
-      <div class="field">
-        <%= form.label :password %>
-        <%= form.password_field :password, autocomplete: "current-password", required: true %>
+    <div class="auth-card">
+      <div class="auth-card__brand">Cactus Bug Tracker</div>
+      <h2>Sign in</h2>
+      <p class="auth-card__subtitle">Use one of the seeded project accounts or a manually created user.</p>
+
+      <%= form_with url: session_path, method: :post, class: "auth-form" do |form| %>
+        <div class="field">
+          <%= form.label :email %>
+          <%= form.email_field :email, autofocus: true, autocomplete: "email", required: true %>
+        </div>
+
+        <div class="field">
+          <%= form.label :password %>
+          <%= form.password_field :password, autocomplete: "current-password", required: true %>
+        </div>
+
+        <div class="actions">
+          <%= form.submit "Sign in", class: "button button--wide" %>
+        </div>
+      <% end %>
+
+      <div class="auth-card__hint">
+        <strong>Default development password:</strong> <code>password123</code>
       </div>
-
-      <div class="actions">
-        <%= form.submit "Sign in", class: "button" %>
-      </div>
-    <% end %>
-
-    <div class="auth-card__hint">
-      <strong>Default development password:</strong> <code>password123</code>
     </div>
   </section>
 </main>

@@ -1,0 +1,39 @@
+<article class="detail-card">
+  <div class="detail-card__eyebrow">Discussion</div>
+  <div class="feed-header">
+    <div>
+      <h2>Comments</h2>
+      <p class="detail-muted">Threaded working notes, debugging context, and follow-up information.</p>
+    </div>
+    <span class="list-pill"><%= @visible_comments.size %> visible</span>
+  </div>
+
+  <div class="feed-toolbar">
+    <div class="feed-toolbar__group">
+      <%= link_to(@comment_order == "newest" ? "Newest first" : "Switch to newest", ticket_path(ticket, event_filter: @event_filter, event_order: @event_order, comment_order: "newest", anchor: "comments"), class: "filter-chip #{'filter-chip--active' if @comment_order == 'newest'}") %>
+      <%= link_to(@comment_order == "oldest" ? "Oldest first" : "Switch to oldest", ticket_path(ticket, event_filter: @event_filter, event_order: @event_order, comment_order: "oldest", anchor: "comments"), class: "filter-chip #{'filter-chip--active' if @comment_order == 'oldest'}") %>
+    </div>
+  </div>
+
+  <% if @visible_comments.any? %>
+    <div class="timeline">
+      <% @visible_comments.each do |comment| %>
+        <div class="timeline__item">
+          <div class="timeline__meta">
+            <div class="timeline__identity">
+              <span class="comment-avatar"><%= comment.author.name.first.upcase %></span>
+              <strong><%= comment.author.name %></strong>
+            </div>
+            <div class="timeline__timestamps">
+              <span><%= time_ago_in_words(comment.created_at) %> ago</span>
+              <span><%= comment.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+            </div>
+          </div>
+          <div class="timeline__body timeline__body--preserve"><%= simple_format(comment.body) %></div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="detail-muted">No comments yet.</p>
+  <% end %>
+</article>

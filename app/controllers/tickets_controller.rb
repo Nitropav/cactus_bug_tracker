@@ -19,6 +19,7 @@ class TicketsController < ApplicationController
       flash.now[:alert] = transition_error_message(@ticket.status)
       render :new, status: :unprocessable_entity
     elsif @ticket.save
+      TicketEventLogger.log_ticket_created!(ticket: @ticket, actor: current_user)
       redirect_to @ticket, notice: "Ticket created successfully."
     else
       render :new, status: :unprocessable_entity
@@ -34,6 +35,7 @@ class TicketsController < ApplicationController
       flash.now[:alert] = transition_error_message(@ticket.status)
       render :edit, status: :unprocessable_entity
     elsif @ticket.save
+      TicketEventLogger.log_ticket_updated!(ticket: @ticket, actor: current_user, changes: @ticket.saved_changes)
       redirect_to @ticket, notice: "Ticket updated successfully."
     else
       render :edit, status: :unprocessable_entity
@@ -48,7 +50,13 @@ class TicketsController < ApplicationController
   private
 
   def set_ticket
-    @ticket = Ticket.includes(:reported_by, :assigned_to, :gate_one, :gate_two).find(params[:id])
+    @ticket = Ticket.includes(:reported_by, :assigned_to, :gate_one, :gate_two, comments: :author, events: :actor).find(params[:id])
+    @new_comment = @ticket.comments.build
+    @event_filter = normalized_event_filter
+    @event_order = normalized_order_param(params[:event_order], default: "newest")
+    @comment_order = normalized_order_param(params[:comment_order], default: "newest")
+    @visible_events = build_visible_events
+    @visible_comments = build_visible_comments
   end
 
   def load_assignable_users
@@ -74,5 +82,23 @@ class TicketsController < ApplicationController
     else
       "That status change is not allowed yet."
     end
+  end
+
+  def normalized_event_filter
+    value = params[:event_filter].to_s
+    TicketEvent.filter_options.include?(value) ? value : "all"
+  end
+
+  def normalized_order_param(value, default:)
+    value.to_s == "oldest" ? "oldest" : default
+  end
+
+  def build_visible_events
+    scoped = @ticket.events.filtered_by(@event_filter)
+    @event_order == "oldest" ? scoped.chronological : scoped.recent_first
+  end
+
+  def build_visible_comments
+    @comment_order == "oldest" ? @ticket.comments.chronological : @ticket.comments.order(created_at: :desc)
   end
 end

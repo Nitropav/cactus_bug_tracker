@@ -24,6 +24,14 @@ class User < ApplicationRecord
            foreign_key: :assigned_to_id,
            inverse_of: :assigned_to,
            dependent: :nullify
+  has_many :ticket_comments,
+           foreign_key: :author_id,
+           inverse_of: :author,
+           dependent: :nullify
+  has_many :ticket_events,
+           foreign_key: :actor_id,
+           inverse_of: :actor,
+           dependent: :nullify
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true

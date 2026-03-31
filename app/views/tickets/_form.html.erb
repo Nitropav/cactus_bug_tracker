@@ -10,41 +10,71 @@
     </div>
   <% end %>
 
-  <div class="form-grid">
-    <div class="field field--span-2">
-      <%= form.label :title %>
-      <%= form.text_field :title, required: true %>
-    </div>
+  <div class="form-shell">
+    <section class="form-section">
+      <div class="form-section__header">
+        <div class="detail-card__eyebrow">Identity</div>
+        <h2>Ticket basics</h2>
+        <p class="detail-muted">Define the issue title and the short operational summary people will see in lists and dashboards.</p>
+      </div>
 
-    <div class="field field--span-2">
-      <%= form.label :summary %>
-      <%= form.text_area :summary, rows: 5 %>
-    </div>
+      <div class="form-grid">
+        <div class="field field--span-2">
+          <%= form.label :title %>
+          <%= form.text_field :title, required: true, placeholder: "Concise statement of the bug or operational issue" %>
+        </div>
 
-    <div class="field">
-      <%= form.label :status %>
-      <%= form.select :status, Ticket.statuses.keys.map { |value| [value.humanize, value] } %>
-    </div>
+        <div class="field field--span-2">
+          <%= form.label :summary %>
+          <%= form.text_area :summary, rows: 5, placeholder: "What is happening, who is affected, and why should the team care?" %>
+        </div>
+      </div>
+    </section>
 
-    <div class="field">
-      <%= form.label :severity %>
-      <%= form.select :severity, Ticket.severities.keys.map { |value| [value.humanize, value] } %>
-    </div>
+    <section class="form-section">
+      <div class="form-section__header">
+        <div class="detail-card__eyebrow">Workflow</div>
+        <h2>Triage settings</h2>
+        <p class="detail-muted">Pick the lifecycle stage, severity, domain, and the initial owner for this ticket.</p>
+      </div>
 
-    <div class="field">
-      <%= form.label :domain %>
-      <%= form.select :domain, Ticket::DOMAINS.map { |value| [value.humanize, value] } %>
-    </div>
+      <div class="form-grid">
+        <div class="field">
+          <%= form.label :status %>
+          <%= form.select :status, Ticket.statuses.keys.map { |value| [value.humanize, value] } %>
+        </div>
 
-    <div class="field">
-      <%= form.label :assigned_to_id, "Assigned to" %>
-      <%= form.select :assigned_to_id, options_for_select([["Unassigned", nil]] + @assignable_users.map { |user| ["#{user.name} (#{user.display_role})", user.id] }, ticket.assigned_to_id) %>
-    </div>
+        <div class="field">
+          <%= form.label :severity %>
+          <%= form.select :severity, Ticket.severities.keys.map { |value| [value.humanize, value] } %>
+        </div>
 
-    <div class="field field--span-2">
-      <%= form.label :external_reference %>
-      <%= form.text_field :external_reference, placeholder: "Optional external ID, issue link, or imported reference" %>
-    </div>
+        <div class="field">
+          <%= form.label :domain %>
+          <%= form.select :domain, Ticket::DOMAINS.map { |value| [value.humanize, value] } %>
+        </div>
+
+        <div class="field">
+          <%= form.label :assigned_to_id, "Assigned to" %>
+          <%= form.select :assigned_to_id, options_for_select([["Unassigned", nil]] + @assignable_users.map { |user| ["#{user.name} (#{user.display_role})", user.id] }, ticket.assigned_to_id) %>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-section__header">
+        <div class="detail-card__eyebrow">References</div>
+        <h2>External linkage</h2>
+        <p class="detail-muted">Optional source identifiers like imported ticket ids, issue URLs, or handoff references.</p>
+      </div>
+
+      <div class="form-grid">
+        <div class="field field--span-2">
+          <%= form.label :external_reference %>
+          <%= form.text_field :external_reference, placeholder: "Optional external ID, issue link, or imported reference" %>
+        </div>
+      </div>
+    </section>
   </div>
 
   <div class="form-actions">

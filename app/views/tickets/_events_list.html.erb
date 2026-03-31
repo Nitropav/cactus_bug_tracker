@@ -1,0 +1,48 @@
+<article class="detail-card">
+  <div class="detail-card__eyebrow">Activity</div>
+  <div class="feed-header">
+    <div>
+      <h2>Event log</h2>
+      <p class="detail-muted">Workflow history and state transitions for this ticket.</p>
+    </div>
+    <span class="list-pill"><%= @visible_events.size %> visible</span>
+  </div>
+
+  <div class="feed-toolbar">
+    <div class="feed-toolbar__group">
+      <% TicketEvent.filter_options.each do |filter_key| %>
+        <% active = @event_filter == filter_key %>
+        <%= link_to filter_key.humanize, ticket_path(ticket, event_filter: filter_key, event_order: @event_order, comment_order: @comment_order), class: "filter-chip #{'filter-chip--active' if active}" %>
+      <% end %>
+    </div>
+
+    <div class="feed-toolbar__group">
+      <% newest_active = @event_order == "newest" %>
+      <%= link_to(newest_active ? "Newest first" : "Switch to newest", ticket_path(ticket, event_filter: @event_filter, event_order: "newest", comment_order: @comment_order), class: "filter-chip #{'filter-chip--active' if newest_active}") %>
+      <%= link_to((@event_order == "oldest" ? "Oldest first" : "Switch to oldest"), ticket_path(ticket, event_filter: @event_filter, event_order: "oldest", comment_order: @comment_order), class: "filter-chip #{'filter-chip--active' if @event_order == 'oldest'}") %>
+    </div>
+  </div>
+
+  <% if @visible_events.any? %>
+    <div class="timeline">
+      <% @visible_events.each do |event| %>
+        <div class="timeline__item">
+          <div class="timeline__meta">
+            <div class="timeline__identity">
+              <span class="event-badge event-badge--<%= event.filter_group %>"><%= event.badge_label %></span>
+              <strong><%= event.actor&.name || "System" %></strong>
+            </div>
+            <div class="timeline__timestamps">
+              <span><%= time_ago_in_words(event.created_at) %> ago</span>
+              <span><%= event.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+            </div>
+          </div>
+          <div class="timeline__label"><%= event.event_type.humanize %></div>
+          <div class="timeline__body"><%= event.message %></div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="detail-muted">No events yet.</p>
+  <% end %>
+</article>

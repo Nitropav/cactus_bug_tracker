@@ -1,0 +1,35 @@
+<article class="detail-card">
+  <div class="detail-card__eyebrow">Add context</div>
+  <h2>Add comment</h2>
+  <p class="detail-muted">Use this for triage notes, debugging context, follow-ups, or handoff details.</p>
+
+  <%= form_with model: new_comment, url: ticket_comments_path(ticket), class: "ticket-form", data: { controller: "comment-composer" } do |form| %>
+    <div class="composer-templates">
+      <button type="button" class="filter-chip" data-action="comment-composer#insertTemplate" data-comment-composer-template-param="Observed behavior:\n- \n\nImpact:\n- ">
+        Repro note
+      </button>
+      <button type="button" class="filter-chip" data-action="comment-composer#insertTemplate" data-comment-composer-template-param="Debugging notes:\n- \n\nSuspected root cause:\n- ">
+        Debug note
+      </button>
+      <button type="button" class="filter-chip" data-action="comment-composer#insertTemplate" data-comment-composer-template-param="Next steps:\n1. \n2. \n3. ">
+        Next steps
+      </button>
+      <button type="button" class="filter-chip" data-action="comment-composer#clear">
+        Clear
+      </button>
+    </div>
+
+    <div class="field">
+      <%= form.label :body, "Comment" %>
+      <%= form.text_area :body, rows: 5, placeholder: "Add triage notes, debugging context, or next steps.", data: { comment_composer_target: "input", action: "input->comment-composer#updateCount" } %>
+      <div class="composer-footer">
+        <span class="detail-muted">Shortcut templates make repetitive updates faster.</span>
+        <span class="composer-count" data-comment-composer-target="count">0 chars</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Add comment", class: "button" %>
+    </div>
+  <% end %>
+</article>

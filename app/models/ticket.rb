@@ -29,6 +29,8 @@ class Ticket < ApplicationRecord
 
   has_one :gate_one, class_name: "TicketGateOne", dependent: :destroy, inverse_of: :ticket
   has_one :gate_two, class_name: "TicketGateTwo", dependent: :destroy, inverse_of: :ticket
+  has_many :comments, class_name: "TicketComment", dependent: :destroy, inverse_of: :ticket
+  has_many :events, class_name: "TicketEvent", dependent: :destroy, inverse_of: :ticket
 
   validates :title, presence: true
   validates :domain, presence: true, inclusion: { in: DOMAINS }

@@ -1,0 +1,61 @@
+<article class="detail-card">
+  <div class="gate-card__header">
+    <div>
+      <div class="detail-card__eyebrow">Reporter gate</div>
+      <h2>Gate 1</h2>
+      <p class="detail-muted">Reporter completeness gate.</p>
+      <div class="gate-card__requirements">
+        <span class="list-pill">Problem description</span>
+        <span class="list-pill">Repro steps</span>
+        <span class="list-pill">Expected vs actual</span>
+        <span class="list-pill">Environment context</span>
+      </div>
+    </div>
+    <div class="gate-card__status">
+      <p class="gate-state <%= ticket.gate_one_complete? ? "gate-state--complete" : "gate-state--pending" %>">
+        <%= ticket.gate_one_complete? ? "Complete" : "Pending" %>
+      </p>
+      <p class="detail-muted">
+        <%= ticket.gate_one.completed_at ? "Completed #{ticket.gate_one.completed_at.strftime("%Y-%m-%d %H:%M")}" : "Not completed yet" %>
+      </p>
+    </div>
+  </div>
+
+  <%= form_with model: ticket.gate_one, url: ticket_gate_one_path(ticket), method: :patch, class: "ticket-form" do |form| %>
+    <div class="form-grid form-grid--gates">
+      <div class="field field--span-2">
+        <%= form.label :problem_description %>
+        <%= form.text_area :problem_description, rows: 4, placeholder: "What is broken? What user-visible behavior is wrong?" %>
+      </div>
+
+      <div class="field field--span-2">
+        <%= form.label :reproduction_steps %>
+        <%= form.text_area :reproduction_steps, rows: 5, placeholder: "List the exact steps required to reproduce the issue." %>
+      </div>
+
+      <div class="field">
+        <%= form.label :expected_behavior %>
+        <%= form.text_area :expected_behavior, rows: 4, placeholder: "What should happen?" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :actual_behavior %>
+        <%= form.text_area :actual_behavior, rows: 4, placeholder: "What actually happens?" %>
+      </div>
+
+      <div class="field field--span-2">
+        <%= form.label :environment_context %>
+        <%= form.text_area :environment_context, rows: 4, placeholder: "Browser, customer, document, deployment, feature flag, or other context." %>
+      </div>
+
+      <div class="field field--span-2">
+        <%= form.label :attachments_summary %>
+        <%= form.text_area :attachments_summary, rows: 3, placeholder: "Optional links or notes for screenshots, videos, stack traces, or supporting evidence." %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Save Gate 1", class: "button" %>
+    </div>
+  <% end %>
+</article>

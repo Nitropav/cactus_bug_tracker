@@ -11,35 +11,70 @@
 
   <div class="surface">
     <% if @tickets.any? %>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Severity</th>
-            <th>Domain</th>
-            <th>Reporter</th>
-            <th>Assigned to</th>
-            <th>Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @tickets.each do |ticket| %>
-            <tr>
-              <td>
-                <%= link_to ticket.title, ticket_path(ticket) %>
-                <div class="table-meta"><%= ticket.summary.presence || "No summary yet" %></div>
-              </td>
-              <td><span class="status-pill status-pill--<%= ticket.status %>"><%= ticket.display_status %></span></td>
-              <td><span class="severity-pill severity-pill--<%= ticket.severity %>"><%= ticket.display_severity %></span></td>
-              <td><%= ticket.domain.humanize %></td>
-              <td><%= ticket.reported_by.name %></td>
-              <td><%= ticket.assigned_to&.name || "Unassigned" %></td>
-              <td><%= ticket.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <div class="list-toolbar">
+        <div>
+          <div class="list-toolbar__eyebrow">List view</div>
+          <h2>All tickets</h2>
+          <p>Structured like an operations list: clear ownership, stage, and gate readiness.</p>
+        </div>
+
+        <div class="list-toolbar__summary">
+          <span class="list-pill"><strong><%= @tickets.count %></strong> total</span>
+          <span class="list-pill"><strong><%= @tickets.count(&:gate_one_complete?) %></strong> gate 1 ready</span>
+          <span class="list-pill"><strong><%= @tickets.count(&:gate_two_complete?) %></strong> gate 2 ready</span>
+        </div>
+      </div>
+
+      <div class="ticket-list">
+        <div class="ticket-list__head">
+          <span>Ticket</span>
+          <span>Ownership</span>
+          <span>Stage</span>
+          <span>Updated</span>
+          <span class="ticket-list__head-actions">Action</span>
+        </div>
+
+        <% @tickets.each do |ticket| %>
+          <article class="ticket-row">
+            <div class="ticket-row__ticket">
+              <div class="ticket-row__number">BT-<%= ticket.id.to_s.rjust(4, "0") %></div>
+              <div>
+                <%= link_to ticket.title, ticket_path(ticket), class: "ticket-row__title" %>
+                <p class="ticket-row__summary"><%= ticket.summary.presence || "No summary yet" %></p>
+                <div class="ticket-row__submeta">
+                  <span><%= ticket.domain.humanize %></span>
+                  <span>External: <%= ticket.external_reference.presence || "None" %></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ticket-row__ownership">
+              <div><strong>Reporter</strong> <span><%= ticket.reported_by.name %></span></div>
+              <div><strong>Assignee</strong> <span><%= ticket.assigned_to&.name || "Unassigned" %></span></div>
+            </div>
+
+            <div class="ticket-row__stage">
+              <div class="ticket-row__pills">
+                <span class="status-pill status-pill--<%= ticket.status %>"><%= ticket.display_status %></span>
+                <span class="severity-pill severity-pill--<%= ticket.severity %>"><%= ticket.display_severity %></span>
+              </div>
+              <div class="ticket-row__gates">
+                <span class="gate-state gate-state--<%= ticket.gate_one_complete? ? "complete" : "pending" %>">Gate 1 <%= ticket.gate_one_complete? ? "Complete" : "Pending" %></span>
+                <span class="gate-state gate-state--<%= ticket.gate_two_complete? ? "complete" : "pending" %>">Gate 2 <%= ticket.gate_two_complete? ? "Complete" : "Pending" %></span>
+              </div>
+            </div>
+
+            <div class="ticket-row__updated">
+              <strong><%= ticket.updated_at.strftime("%Y-%m-%d") %></strong>
+              <span><%= ticket.updated_at.strftime("%H:%M") %></span>
+            </div>
+
+            <div class="ticket-row__actions">
+              <%= link_to "Open", ticket_path(ticket), class: "button button--secondary ticket-row__action" %>
+            </div>
+          </article>
+        <% end %>
+      </div>
     <% else %>
       <div class="empty-state">
         <h2>No tickets yet</h2>

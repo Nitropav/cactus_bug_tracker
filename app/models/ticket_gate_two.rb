@@ -9,7 +9,15 @@ class TicketGateTwo < ApplicationRecord
 
   validates :ticket_id, uniqueness: true
 
+  before_save :sync_completed_at
+
   def complete?
     REQUIRED_FIELDS.all? { |field| public_send(field).present? }
+  end
+
+  private
+
+  def sync_completed_at
+    self.completed_at = complete? ? Time.current : nil
   end
 end

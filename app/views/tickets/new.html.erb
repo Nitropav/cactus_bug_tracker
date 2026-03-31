@@ -1,14 +1,42 @@
 <% content_for :title, "New ticket" %>
 
 <main class="page">
-  <div class="page-header">
+  <section class="hero-banner hero-banner--ticket">
     <div>
+      <div class="hero-banner__eyebrow">Create ticket</div>
       <h1>New ticket</h1>
       <p class="page-subtitle">Capture the issue shell before Gate 1 and Gate 2 details are filled in.</p>
-    </div>
-  </div>
 
-  <section class="surface">
+      <div class="hero-banner__meta">
+        <span class="status-pill status-pill--<%= @ticket.status %>"><%= @ticket.display_status %></span>
+        <span class="severity-pill severity-pill--<%= @ticket.severity %>"><%= @ticket.display_severity %></span>
+        <span class="mini-ticket__domain"><%= @ticket.domain.humanize %></span>
+      </div>
+    </div>
+
+    <div class="hero-banner__actions hero-banner__actions--stacked">
+      <div class="ticket-show__stats">
+        <div class="ticket-show__stat">
+          <span>Reporter</span>
+          <strong><%= current_user.name %></strong>
+        </div>
+        <div class="ticket-show__stat">
+          <span>Starting state</span>
+          <strong>Draft ticket shell</strong>
+        </div>
+        <div class="ticket-show__stat">
+          <span>Next step</span>
+          <strong>Fill Gate 1 after save</strong>
+        </div>
+      </div>
+
+      <div class="page-header__actions">
+        <%= link_to "All tickets", tickets_path, class: "button button--secondary" %>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface ticket-section-gap">
     <%= render "form", ticket: @ticket %>
   </section>
 </main>

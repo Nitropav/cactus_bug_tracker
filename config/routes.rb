@@ -6,7 +6,11 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get "login", to: "sessions#new", as: :login
   delete "logout", to: "sessions#destroy", as: :logout
-  resources :tickets
+  resources :tickets do
+    resource :gate_one, only: :update, controller: "ticket_gate_ones"
+    resource :gate_two, only: :update, controller: "ticket_gate_twos"
+    resources :comments, only: :create, controller: "ticket_comments"
+  end
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

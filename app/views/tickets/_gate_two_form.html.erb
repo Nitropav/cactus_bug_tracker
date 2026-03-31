@@ -1,0 +1,56 @@
+<article class="detail-card">
+  <div class="gate-card__header">
+    <div>
+      <div class="detail-card__eyebrow">Developer gate</div>
+      <h2>Gate 2</h2>
+      <p class="detail-muted">Developer resolution gate.</p>
+      <div class="gate-card__requirements">
+        <span class="list-pill">Root cause</span>
+        <span class="list-pill">Fix summary</span>
+        <span class="list-pill">Verification</span>
+        <span class="list-pill">Commit or PR link</span>
+      </div>
+    </div>
+    <div class="gate-card__status">
+      <p class="gate-state <%= ticket.gate_two_complete? ? "gate-state--complete" : "gate-state--pending" %>">
+        <%= ticket.gate_two_complete? ? "Complete" : "Pending" %>
+      </p>
+      <p class="detail-muted">
+        <%= ticket.gate_two.completed_at ? "Completed #{ticket.gate_two.completed_at.strftime("%Y-%m-%d %H:%M")}" : "Not completed yet" %>
+      </p>
+    </div>
+  </div>
+
+  <%= form_with model: ticket.gate_two, url: ticket_gate_two_path(ticket), method: :patch, class: "ticket-form" do |form| %>
+    <div class="form-grid form-grid--gates">
+      <div class="field field--span-2">
+        <%= form.label :root_cause %>
+        <%= form.text_area :root_cause, rows: 5, placeholder: "Explain the technical cause in plain language." %>
+      </div>
+
+      <div class="field field--span-2">
+        <%= form.label :fix_summary %>
+        <%= form.text_area :fix_summary, rows: 5, placeholder: "Describe the code or configuration change that fixes the issue." %>
+      </div>
+
+      <div class="field field--span-2">
+        <%= form.label :verification_steps %>
+        <%= form.text_area :verification_steps, rows: 4, placeholder: "How was the fix verified?" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :primary_commit_sha %>
+        <%= form.text_field :primary_commit_sha, placeholder: "Optional commit SHA" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :primary_pull_request_url %>
+        <%= form.url_field :primary_pull_request_url, placeholder: "Optional PR URL" %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Save Gate 2", class: "button" %>
+    </div>
+  <% end %>
+</article>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="light">
   <head>
     <title><%= content_for(:title) || "Cactus Bug Tracker" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -17,41 +17,108 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <script>
+      (function() {
+        try {
+          var key = "cactus-theme";
+          var stored = window.localStorage.getItem(key);
+          var system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.dataset.theme = stored || system;
+        } catch (error) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <header class="app-shell__header">
-      <div class="app-shell__brand">
-        <%= link_to "Cactus Bug Tracker", root_path %>
+  <body class="<%= signed_in? ? "app-shell" : "auth-shell" %>" data-controller="theme">
+    <% if signed_in? %>
+      <div class="shell">
+        <aside class="shell__sidebar">
+          <div class="brand-panel">
+            <div class="brand-panel__mark">C</div>
+            <div>
+              <div class="brand-panel__eyebrow">Cactus</div>
+              <div class="brand-panel__title">Bug Tracker</div>
+            </div>
+          </div>
+
+          <nav class="sidebar-nav">
+            <%= link_to root_path, class: "sidebar-nav__link #{'sidebar-nav__link--active' if current_page?(root_path)}" do %>
+              <span class="sidebar-nav__icon sidebar-nav__icon--dashboard" aria-hidden="true"></span>
+              <span>Dashboard</span>
+            <% end %>
+
+            <%= link_to tickets_path, class: "sidebar-nav__link #{'sidebar-nav__link--active' if request.path.start_with?('/tickets')}" do %>
+              <span class="sidebar-nav__icon sidebar-nav__icon--tickets" aria-hidden="true"></span>
+              <span>Tickets</span>
+            <% end %>
+          </nav>
+
+          <div class="sidebar-user">
+            <div class="sidebar-user__avatar"><%= current_user.name.first.upcase %></div>
+            <div>
+              <div class="sidebar-user__name"><%= current_user.name %></div>
+              <div class="sidebar-user__role"><%= current_user.display_role %></div>
+            </div>
+          </div>
+        </aside>
+
+        <div class="shell__main">
+          <header class="topbar">
+            <div class="topbar__title">
+              <div class="topbar__eyebrow">Workspace</div>
+              <div class="topbar__headline"><%= content_for(:title) || "Cactus Bug Tracker" %></div>
+            </div>
+
+            <div class="topbar__actions">
+              <button type="button" class="theme-toggle" data-action="click->theme#toggle">
+                <span class="theme-toggle__icon" aria-hidden="true"></span>
+                <span data-theme-target="label">Theme</span>
+              </button>
+              <%= button_to "Logout", logout_path, method: :delete, class: "button button--secondary button--ghost" %>
+            </div>
+          </header>
+
+          <div class="shell__content">
+            <% if flash[:notice].present? || flash[:alert].present? %>
+              <div class="flash-stack">
+                <% if flash[:notice].present? %>
+                  <div class="flash flash--notice"><%= flash[:notice] %></div>
+                <% end %>
+                <% if flash[:alert].present? %>
+                  <div class="flash flash--alert"><%= flash[:alert] %></div>
+                <% end %>
+              </div>
+            <% end %>
+
+            <%= yield %>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="auth-shell__toggle">
+        <button type="button" class="theme-toggle" data-action="click->theme#toggle">
+          <span class="theme-toggle__icon" aria-hidden="true"></span>
+          <span data-theme-target="label">Theme</span>
+        </button>
       </div>
 
-      <% if signed_in? %>
-        <nav class="app-shell__nav">
-          <%= link_to "Dashboard", root_path, class: "app-shell__nav-link" %>
-          <%= link_to "Tickets", tickets_path, class: "app-shell__nav-link" %>
-        </nav>
-
-        <div class="app-shell__session">
-          <span><strong><%= current_user.name %></strong> · <%= current_user.display_role %></span>
-          <%= button_to "Logout", logout_path, method: :delete, class: "button button--secondary" %>
+      <% if flash[:notice].present? || flash[:alert].present? %>
+        <div class="flash-stack flash-stack--auth">
+          <% if flash[:notice].present? %>
+            <div class="flash flash--notice"><%= flash[:notice] %></div>
+          <% end %>
+          <% if flash[:alert].present? %>
+            <div class="flash flash--alert"><%= flash[:alert] %></div>
+          <% end %>
         </div>
       <% end %>
-    </header>
 
-    <% if flash[:notice].present? || flash[:alert].present? %>
-      <div class="flash-stack">
-        <% if flash[:notice].present? %>
-          <div class="flash flash--notice"><%= flash[:notice] %></div>
-        <% end %>
-        <% if flash[:alert].present? %>
-          <div class="flash flash--alert"><%= flash[:alert] %></div>
-        <% end %>
-      </div>
+      <%= yield %>
     <% end %>
-
-    <%= yield %>
   </body>
 </html>
