@@ -41,6 +41,13 @@ This means the app already has the shell of the product.
 
 What is still missing is the real product workflow: permissions, transitions, training examples, review, and export.
 
+### Progress Snapshot
+
+- `Phase 1: Workflow Enforcement` -> core implementation complete
+- `Phase 2: Role Permissions` -> ticket-level implementation mostly complete
+- `Phase 7: Workflow Polish and Data Integrity` -> partially complete through comments/events ordering, filtering, and better event payload UX
+- Next recommended build phase -> `Phase 3: Commit and PR Linking`
+
 ---
 
 ## 3. Target MVP Flow
@@ -75,6 +82,8 @@ These rules should guide all next work:
 
 ## 5. Phase 1: Workflow Enforcement
 
+**Status:** Complete
+
 ### Goal
 
 Turn `status` into a real controlled workflow instead of a free editable field.
@@ -102,12 +111,12 @@ Expected rules:
 
 ### Implementation Tasks
 
-- [ ] Introduce a dedicated transition service, for example:
+- [x] Introduce a dedicated transition service, for example:
   - `app/services/ticket_transition_service.rb`
-- [ ] Move transition rules out of ad-hoc controller checks
-- [ ] Define allowed transition matrix
-- [ ] Return clear failure reason when transition is blocked
-- [ ] Ensure event log records status transitions consistently
+- [x] Move transition rules out of ad-hoc controller checks
+- [x] Define allowed transition matrix
+- [x] Return clear failure reason when transition is blocked
+- [x] Ensure event log records status transitions consistently
 
 ### Suggested Service Shape
 
@@ -129,6 +138,8 @@ Expected rules:
 ---
 
 ## 6. Phase 2: Role Permissions
+
+**Status:** In progress, ticket-level enforcement is in place
 
 ### Goal
 
@@ -171,22 +182,30 @@ Enforce who can do what.
 
 ### Implementation Tasks
 
-- [ ] Add policy layer, for example:
+- [x] Add policy layer, for example:
   - `app/policies/ticket_policy.rb`
   - `app/policies/training_example_policy.rb`
-- [ ] Restrict ticket edit/update actions by role
-- [ ] Restrict transition actions by role
+- [x] Restrict ticket edit/update actions by role
+- [x] Restrict transition actions by role
 - [ ] Restrict review/export actions by role
-- [ ] Show clear access denied behavior
+- [x] Show clear access denied behavior
 
 ### Acceptance Criteria
 
 - role restrictions are enforced server-side
 - restricted users cannot bypass UI by manual requests
 
+### Notes
+
+- Ticket creation, editing, destruction, comments, `Gate 1`, `Gate 2`, and status changes are now role-aware.
+- UI is also policy-aware for ticket-level actions.
+- `training_example` review/export permissions are still pending because the review/export flow is not built yet.
+
 ---
 
 ## 7. Phase 3: Commit and PR Linking
+
+**Status:** Not started
 
 ### Goal
 
@@ -225,6 +244,8 @@ Suggested fields:
 ---
 
 ## 8. Phase 4: Training Example Model
+
+**Status:** Not started
 
 ### Goal
 
@@ -282,6 +303,8 @@ Suggested fields:
 
 ## 9. Phase 5: Reviewer Queue
 
+**Status:** Not started
+
 ### Goal
 
 Introduce human validation before export.
@@ -313,6 +336,8 @@ Introduce human validation before export.
 ---
 
 ## 10. Phase 6: JSONL Export
+
+**Status:** Not started
 
 ### Goal
 
@@ -364,6 +389,8 @@ Possible fields:
 
 ## 11. Phase 7: Workflow Polish and Data Integrity
 
+**Status:** Partially complete
+
 ### Goal
 
 Remove ambiguity from the working ticket lifecycle.
@@ -372,8 +399,8 @@ Remove ambiguity from the working ticket lifecycle.
 
 - [ ] Add transition buttons instead of relying only on generic edit form
 - [ ] Surface gate completeness warnings on ticket pages
-- [ ] Improve event payloads so timeline is more meaningful
-- [ ] Normalize comments/events ordering and filtering
+- [x] Improve event payloads so timeline is more meaningful
+- [x] Normalize comments/events ordering and filtering
 - [ ] Add audit-friendly metadata where useful
 
 ### Acceptance Criteria
@@ -384,6 +411,8 @@ Remove ambiguity from the working ticket lifecycle.
 ---
 
 ## 12. Phase 8: External Integrations
+
+**Status:** Not started
 
 This is not the next step, but it should be planned.
 
@@ -406,6 +435,8 @@ This is not the next step, but it should be planned.
 ---
 
 ## 13. Phase 9: AI Integration
+
+**Status:** Not started
 
 AI should come after the manual workflow is solid.
 
@@ -430,15 +461,15 @@ This is the order we should actually follow:
 
 ### Step 1
 
-- [ ] Workflow enforcement
-- [ ] transition service
-- [ ] backend transition rules
+- [x] Workflow enforcement
+- [x] transition service
+- [x] backend transition rules
 
 ### Step 2
 
-- [ ] Role permissions
-- [ ] policy layer
-- [ ] restrict actions by role
+- [x] Role permissions
+- [x] policy layer
+- [x] restrict actions by role
 
 ### Step 3
 
@@ -472,20 +503,20 @@ This is the order we should actually follow:
 
 The next implementation task should be:
 
-### Workflow Enforcement + Role Permissions
+### Commit / PR Linking
 
 Specifically:
 
-- create transition service
-- define allowed transitions
-- add role-based restrictions for status changes and ticket editing
-- wire the controller layer to the service instead of direct status assignment
+- create `TicketCommit` model and migration
+- allow multiple linked commits per ticket
+- expose commit links on ticket show
+- make linked commit data readable by future `TrainingExample` builder
 
 This is the right next step because:
 
-- without workflow enforcement, tickets are still just editable records
-- without permissions, review/export logic will be weak
-- `TrainingExample` should be built on top of a reliable state machine
+- workflow and role restrictions are already in place for tickets
+- the next missing source of structured resolution evidence is commit/PR linkage
+- `TrainingExample` should read both gates and implementation references
 
 ---
 
