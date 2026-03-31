@@ -1,0 +1,51 @@
+<% content_for :title, "Tickets" %>
+
+<main class="page">
+  <div class="page-header">
+    <div>
+      <h1>Tickets</h1>
+      <p class="page-subtitle">Track issues, ownership, and gate completeness.</p>
+    </div>
+    <%= link_to "New ticket", new_ticket_path, class: "button" %>
+  </div>
+
+  <div class="surface">
+    <% if @tickets.any? %>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Domain</th>
+            <th>Reporter</th>
+            <th>Assigned to</th>
+            <th>Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @tickets.each do |ticket| %>
+            <tr>
+              <td>
+                <%= link_to ticket.title, ticket_path(ticket) %>
+                <div class="table-meta"><%= ticket.summary.presence || "No summary yet" %></div>
+              </td>
+              <td><span class="status-pill status-pill--<%= ticket.status %>"><%= ticket.display_status %></span></td>
+              <td><span class="severity-pill severity-pill--<%= ticket.severity %>"><%= ticket.display_severity %></span></td>
+              <td><%= ticket.domain.humanize %></td>
+              <td><%= ticket.reported_by.name %></td>
+              <td><%= ticket.assigned_to&.name || "Unassigned" %></td>
+              <td><%= ticket.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="empty-state">
+        <h2>No tickets yet</h2>
+        <p>Create the first ticket to start the workflow.</p>
+        <%= link_to "Create ticket", new_ticket_path, class: "button" %>
+      </div>
+    <% end %>
+  </div>
+</main>

@@ -1,0 +1,14 @@
+<% content_for :title, "Edit ticket" %>
+
+<main class="page">
+  <div class="page-header">
+    <div>
+      <h1>Edit ticket</h1>
+      <p class="page-subtitle">Update ownership, triage metadata, or lifecycle status.</p>
+    </div>
+  </div>
+
+  <section class="surface">
+    <%= render "form", ticket: @ticket %>
+  </section>
+</main>

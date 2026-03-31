@@ -1,0 +1,54 @@
+<%= form_with model: ticket, class: "ticket-form" do |form| %>
+  <% if ticket.errors.any? %>
+    <div class="flash flash--alert">
+      <strong><%= pluralize(ticket.errors.count, "error") %> prevented this ticket from saving:</strong>
+      <ul>
+        <% ticket.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-grid">
+    <div class="field field--span-2">
+      <%= form.label :title %>
+      <%= form.text_field :title, required: true %>
+    </div>
+
+    <div class="field field--span-2">
+      <%= form.label :summary %>
+      <%= form.text_area :summary, rows: 5 %>
+    </div>
+
+    <div class="field">
+      <%= form.label :status %>
+      <%= form.select :status, Ticket.statuses.keys.map { |value| [value.humanize, value] } %>
+    </div>
+
+    <div class="field">
+      <%= form.label :severity %>
+      <%= form.select :severity, Ticket.severities.keys.map { |value| [value.humanize, value] } %>
+    </div>
+
+    <div class="field">
+      <%= form.label :domain %>
+      <%= form.select :domain, Ticket::DOMAINS.map { |value| [value.humanize, value] } %>
+    </div>
+
+    <div class="field">
+      <%= form.label :assigned_to_id, "Assigned to" %>
+      <%= form.select :assigned_to_id, options_for_select([["Unassigned", nil]] + @assignable_users.map { |user| ["#{user.name} (#{user.display_role})", user.id] }, ticket.assigned_to_id) %>
+    </div>
+
+    <div class="field field--span-2">
+      <%= form.label :external_reference %>
+      <%= form.text_field :external_reference, placeholder: "Optional external ID, issue link, or imported reference" %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "button" %>
+    <%= link_to "Cancel", ticket.persisted? ? ticket_path(ticket) : tickets_path, class: "button button--secondary" %>
+  </div>
+<% end %>

@@ -1,0 +1,36 @@
+<% content_for :title, "Cactus Bug Tracker" %>
+
+<main class="page">
+  <h1 style="margin-bottom: 0.5rem;">Cactus Bug Tracker</h1>
+  <p style="margin-top: 0; color: #555;">
+    Initial Rails skeleton is ready. Core ticketing models and Docker development setup are in place.
+  </p>
+
+  <section style="margin-top: 2rem;">
+    <h2 style="font-size: 1.1rem;">Current Day 1 Scope</h2>
+    <ul>
+      <li><code>User</code> with role enum and password support</li>
+      <li><code>Ticket</code> with status, severity, and ownership</li>
+      <li><code>TicketGateOne</code> for reporter completeness</li>
+      <li><code>TicketGateTwo</code> for developer resolution completeness</li>
+      <li>Docker Compose development stack with PostgreSQL</li>
+    </ul>
+  </section>
+
+  <section style="margin-top: 2rem;">
+    <h2 style="font-size: 1.1rem;">Ticket Snapshot</h2>
+    <div class="stats-grid">
+      <% @ticket_counts.each do |status, count| %>
+        <article class="stat-card">
+          <strong><%= status.to_s.humanize %></strong>
+          <div><%= count %></div>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section style="margin-top: 2rem;">
+    <%= link_to "Open tickets", tickets_path, class: "button" %>
+    <%= link_to "Create ticket", new_ticket_path, class: "button button--secondary" %>
+  </section>
+</main>

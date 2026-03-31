@@ -1,0 +1,14 @@
+<% content_for :title, "New ticket" %>
+
+<main class="page">
+  <div class="page-header">
+    <div>
+      <h1>New ticket</h1>
+      <p class="page-subtitle">Capture the issue shell before Gate 1 and Gate 2 details are filled in.</p>
+    </div>
+  </div>
+
+  <section class="surface">
+    <%= render "form", ticket: @ticket %>
+  </section>
+</main>

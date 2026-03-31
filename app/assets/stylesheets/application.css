@@ -1,0 +1,403 @@
+/*
+ * This is a manifest file that'll be compiled into application.css.
+ *
+ * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
+ * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
+ * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
+ * depending on specificity.
+ *
+ * Consider organizing styles into separate files for maintainability.
+ */
+
+:root {
+  --page-bg: #f5f7fb;
+  --surface: #ffffff;
+  --border: #d8dfeb;
+  --text: #1e2430;
+  --muted: #667085;
+  --primary: #1e5eff;
+  --primary-dark: #1549c5;
+  --danger-bg: #fff0f0;
+  --danger-text: #a72b2b;
+  --notice-bg: #ecf6ff;
+  --notice-text: #1f5d8f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--text);
+  background: var(--page-bg);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.page {
+  max-width: 880px;
+  margin: 2rem auto;
+  padding: 0 1rem 2rem;
+  line-height: 1.5;
+}
+
+.app-shell__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-shell__brand a {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.app-shell__session {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-shell__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-left: auto;
+}
+
+.app-shell__nav-link {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.app-shell__nav-link:hover {
+  color: var(--text);
+}
+
+.flash-stack {
+  max-width: 880px;
+  margin: 1rem auto 0;
+  padding: 0 1rem;
+}
+
+.flash {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+}
+
+.flash--notice {
+  background: var(--notice-bg);
+  color: var(--notice-text);
+}
+
+.flash--alert {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.button {
+  appearance: none;
+  border: 0;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--primary-dark);
+}
+
+.button--secondary {
+  background: #eef2f8;
+  color: var(--text);
+}
+
+.button--secondary:hover {
+  background: #dde5f0;
+}
+
+.auth-page {
+  min-height: calc(100vh - 78px);
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  width: min(440px, 100%);
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(17, 24, 39, 0.08);
+}
+
+.auth-card h1 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.auth-card__subtitle {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--muted);
+}
+
+.auth-card__hint {
+  margin-top: 1.25rem;
+  color: var(--muted);
+}
+
+.auth-form .field {
+  margin-bottom: 1rem;
+}
+
+.auth-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.stat-card {
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-subtitle {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+}
+
+.page-header__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.04);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 0.9rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table-meta {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.field--span-2 {
+  grid-column: span 2;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.detail-card h2 {
+  margin-top: 0;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0.7rem 1rem;
+  margin: 0;
+}
+
+.detail-list dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.detail-list dd {
+  margin: 0;
+}
+
+.detail-muted {
+  color: var(--muted);
+}
+
+.status-pill,
+.severity-pill,
+.gate-state {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-pill--draft,
+.status-pill--needs_info {
+  background: #eef2f8;
+  color: #425466;
+}
+
+.status-pill--open,
+.status-pill--in_progress,
+.status-pill--needs_review {
+  background: #fff6de;
+  color: #8a6512;
+}
+
+.status-pill--resolved,
+.status-pill--closed {
+  background: #e9f8ef;
+  color: #1d6f42;
+}
+
+.severity-pill--low {
+  background: #eef2f8;
+  color: #425466;
+}
+
+.severity-pill--medium {
+  background: #ecf6ff;
+  color: #1f5d8f;
+}
+
+.severity-pill--high {
+  background: #fff3e5;
+  color: #8c5212;
+}
+
+.severity-pill--critical {
+  background: #ffe6e6;
+  color: #a72b2b;
+}
+
+.gate-state--complete {
+  background: #e9f8ef;
+  color: #1d6f42;
+}
+
+.gate-state--pending {
+  background: #fff3e5;
+  color: #8c5212;
+}
+
+@media (max-width: 900px) {
+  .page-header,
+  .app-shell__header,
+  .app-shell__session {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .app-shell__nav {
+    margin-left: 0;
+  }
+
+  .form-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field--span-2 {
+    grid-column: auto;
+  }
+
+  .detail-list {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cactus_bug_tracker_development
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cactus_bug_tracker_development"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: development
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME_DEVELOPMENT: cactus_bug_tracker_development
+      DB_NAME_TEST: cactus_bug_tracker_test
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - bundle_data:/usr/local/bundle
+    stdin_open: true
+    tty: true
+    command: ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+
+volumes:
+  postgres_data:
+  bundle_data:
