@@ -21,41 +21,77 @@
     </div>
   </div>
 
-  <%= form_with model: ticket.gate_one, url: ticket_gate_one_path(ticket), method: :patch, class: "ticket-form" do |form| %>
-    <div class="form-grid form-grid--gates">
-      <div class="field field--span-2">
-        <%= form.label :problem_description %>
-        <%= form.text_area :problem_description, rows: 4, placeholder: "What is broken? What user-visible behavior is wrong?" %>
+  <% if @ticket_policy.update_gate_one? %>
+    <%= form_with model: ticket.gate_one, url: ticket_gate_one_path(ticket), method: :patch, class: "ticket-form" do |form| %>
+      <div class="form-grid form-grid--gates">
+        <div class="field field--span-2">
+          <%= form.label :problem_description %>
+          <%= form.text_area :problem_description, rows: 4, placeholder: "What is broken? What user-visible behavior is wrong?" %>
+        </div>
+
+        <div class="field field--span-2">
+          <%= form.label :reproduction_steps %>
+          <%= form.text_area :reproduction_steps, rows: 5, placeholder: "List the exact steps required to reproduce the issue." %>
+        </div>
+
+        <div class="field">
+          <%= form.label :expected_behavior %>
+          <%= form.text_area :expected_behavior, rows: 4, placeholder: "What should happen?" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :actual_behavior %>
+          <%= form.text_area :actual_behavior, rows: 4, placeholder: "What actually happens?" %>
+        </div>
+
+        <div class="field field--span-2">
+          <%= form.label :environment_context %>
+          <%= form.text_area :environment_context, rows: 4, placeholder: "Browser, customer, document, deployment, feature flag, or other context." %>
+        </div>
+
+        <div class="field field--span-2">
+          <%= form.label :attachments_summary %>
+          <%= form.text_area :attachments_summary, rows: 3, placeholder: "Optional links or notes for screenshots, videos, stack traces, or supporting evidence." %>
+        </div>
       </div>
 
-      <div class="field field--span-2">
-        <%= form.label :reproduction_steps %>
-        <%= form.text_area :reproduction_steps, rows: 5, placeholder: "List the exact steps required to reproduce the issue." %>
+      <div class="form-actions">
+        <%= form.submit "Save Gate 1", class: "button" %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="read-only-stack">
+      <div class="read-only-block">
+        <label>Problem description</label>
+        <div class="read-only-value read-only-value--multiline"><%= ticket.gate_one.problem_description.presence || "No problem description provided yet." %></div>
       </div>
 
-      <div class="field">
-        <%= form.label :expected_behavior %>
-        <%= form.text_area :expected_behavior, rows: 4, placeholder: "What should happen?" %>
+      <div class="read-only-block">
+        <label>Reproduction steps</label>
+        <div class="read-only-value read-only-value--multiline"><%= ticket.gate_one.reproduction_steps.presence || "No reproduction steps provided yet." %></div>
       </div>
 
-      <div class="field">
-        <%= form.label :actual_behavior %>
-        <%= form.text_area :actual_behavior, rows: 4, placeholder: "What actually happens?" %>
+      <div class="read-only-block-grid">
+        <div class="read-only-block">
+          <label>Expected behavior</label>
+          <div class="read-only-value read-only-value--multiline"><%= ticket.gate_one.expected_behavior.presence || "Not provided." %></div>
+        </div>
+
+        <div class="read-only-block">
+          <label>Actual behavior</label>
+          <div class="read-only-value read-only-value--multiline"><%= ticket.gate_one.actual_behavior.presence || "Not provided." %></div>
+        </div>
       </div>
 
-      <div class="field field--span-2">
-        <%= form.label :environment_context %>
-        <%= form.text_area :environment_context, rows: 4, placeholder: "Browser, customer, document, deployment, feature flag, or other context." %>
+      <div class="read-only-block">
+        <label>Environment context</label>
+        <div class="read-only-value read-only-value--multiline"><%= ticket.gate_one.environment_context.presence || "No environment context provided." %></div>
       </div>
 
-      <div class="field field--span-2">
-        <%= form.label :attachments_summary %>
-        <%= form.text_area :attachments_summary, rows: 3, placeholder: "Optional links or notes for screenshots, videos, stack traces, or supporting evidence." %>
+      <div class="read-only-block">
+        <label>Attachments summary</label>
+        <div class="read-only-value read-only-value--multiline"><%= ticket.gate_one.attachments_summary.presence || "No attachment notes." %></div>
       </div>
-    </div>
-
-    <div class="form-actions">
-      <%= form.submit "Save Gate 1", class: "button" %>
     </div>
   <% end %>
 </article>

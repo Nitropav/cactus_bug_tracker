@@ -39,4 +39,16 @@ class User < ApplicationRecord
   def display_role
     role.humanize
   end
+
+  def staff?
+    role_developer? || role_reviewer? || role_admin?
+  end
+
+  def can_review?
+    role_reviewer? || role_admin?
+  end
+
+  def can_develop?
+    role_developer? || role_admin?
+  end
 end

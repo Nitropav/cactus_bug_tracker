@@ -33,8 +33,12 @@
 
       <div class="page-header__actions">
         <%= link_to "All tickets", tickets_path, class: "button button--secondary" %>
-        <%= link_to "Edit ticket", edit_ticket_path(@ticket), class: "button" %>
-        <%= button_to "Delete ticket", ticket_path(@ticket), method: :delete, form: { data: { turbo_confirm: "Delete this ticket?" } }, class: "button button--secondary" %>
+        <% if @ticket_policy.update? %>
+          <%= link_to "Edit ticket", edit_ticket_path(@ticket), class: "button" %>
+        <% end %>
+        <% if @ticket_policy.destroy? %>
+          <%= button_to "Delete ticket", ticket_path(@ticket), method: :delete, form: { data: { turbo_confirm: "Delete this ticket?" } }, class: "button button--secondary" %>
+        <% end %>
       </div>
     </div>
   </section>
@@ -92,7 +96,9 @@
   </section>
 
   <section class="detail-grid ticket-section-gap">
-    <%= render "comment_form", ticket: @ticket, new_comment: @new_comment %>
+    <% if @ticket_policy.comment? %>
+      <%= render "comment_form", ticket: @ticket, new_comment: @new_comment %>
+    <% end %>
     <%= render "events_list", ticket: @ticket %>
   </section>
 

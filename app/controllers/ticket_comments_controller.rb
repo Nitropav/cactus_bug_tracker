@@ -2,6 +2,8 @@ class TicketCommentsController < ApplicationController
   before_action :set_ticket
 
   def create
+    return deny_access! unless ticket_policy(@ticket).comment?
+
     @comment = @ticket.comments.build(comment_params.merge(author: current_user))
 
     if @comment.save

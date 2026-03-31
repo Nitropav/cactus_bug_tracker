@@ -2,6 +2,8 @@ class TicketGateTwosController < ApplicationController
   before_action :set_ticket
 
   def update
+    return deny_access! unless ticket_policy(@ticket).update_gate_two?
+
     if @ticket.gate_two.update(gate_two_params)
       TicketEventLogger.log_gate_updated!(
         ticket: @ticket,

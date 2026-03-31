@@ -12,7 +12,9 @@
 
     <div class="hero-banner__actions">
       <%= link_to "Open tickets", tickets_path, class: "button" %>
-      <%= link_to "Create ticket", new_ticket_path, class: "button button--secondary" %>
+      <% if ticket_creation_policy.create? %>
+        <%= link_to "Create ticket", new_ticket_path, class: "button button--secondary" %>
+      <% end %>
     </div>
   </section>
 

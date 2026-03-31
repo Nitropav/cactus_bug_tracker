@@ -19,15 +19,29 @@
       </div>
 
       <div class="form-grid">
-        <div class="field field--span-2">
-          <%= form.label :title %>
-          <%= form.text_field :title, required: true, placeholder: "Concise statement of the bug or operational issue" %>
-        </div>
+        <% if @ticket_policy.can_edit_attribute?(:title) %>
+          <div class="field field--span-2">
+            <%= form.label :title %>
+            <%= form.text_field :title, required: true, placeholder: "Concise statement of the bug or operational issue" %>
+          </div>
+        <% else %>
+          <div class="field field--span-2">
+            <label>Title</label>
+            <div class="read-only-value"><%= ticket.title.presence || "Title is fixed for your role." %></div>
+          </div>
+        <% end %>
 
-        <div class="field field--span-2">
-          <%= form.label :summary %>
-          <%= form.text_area :summary, rows: 5, placeholder: "What is happening, who is affected, and why should the team care?" %>
-        </div>
+        <% if @ticket_policy.can_edit_attribute?(:summary) %>
+          <div class="field field--span-2">
+            <%= form.label :summary %>
+            <%= form.text_area :summary, rows: 5, placeholder: "What is happening, who is affected, and why should the team care?" %>
+          </div>
+        <% else %>
+          <div class="field field--span-2">
+            <label>Summary</label>
+            <div class="read-only-value read-only-value--multiline"><%= ticket.summary.presence || "Summary is fixed for your role." %></div>
+          </div>
+        <% end %>
       </div>
     </section>
 
@@ -39,25 +53,53 @@
       </div>
 
       <div class="form-grid">
-        <div class="field">
-          <%= form.label :status %>
-          <%= form.select :status, Ticket.statuses.keys.map { |value| [value.humanize, value] } %>
-        </div>
+        <% if @ticket_policy.can_edit_attribute?(:status) %>
+          <div class="field">
+            <%= form.label :status %>
+            <%= form.select :status, @ticket_policy.visible_status_options(from_status: ticket.persisted? ? ticket.status : nil).map { |value| [value.humanize, value] } %>
+          </div>
+        <% else %>
+          <div class="field">
+            <label>Status</label>
+            <div class="read-only-value"><%= ticket.display_status %></div>
+          </div>
+        <% end %>
 
-        <div class="field">
-          <%= form.label :severity %>
-          <%= form.select :severity, Ticket.severities.keys.map { |value| [value.humanize, value] } %>
-        </div>
+        <% if @ticket_policy.can_edit_attribute?(:severity) %>
+          <div class="field">
+            <%= form.label :severity %>
+            <%= form.select :severity, Ticket.severities.keys.map { |value| [value.humanize, value] } %>
+          </div>
+        <% else %>
+          <div class="field">
+            <label>Severity</label>
+            <div class="read-only-value"><%= ticket.display_severity %></div>
+          </div>
+        <% end %>
 
-        <div class="field">
-          <%= form.label :domain %>
-          <%= form.select :domain, Ticket::DOMAINS.map { |value| [value.humanize, value] } %>
-        </div>
+        <% if @ticket_policy.can_edit_attribute?(:domain) %>
+          <div class="field">
+            <%= form.label :domain %>
+            <%= form.select :domain, Ticket::DOMAINS.map { |value| [value.humanize, value] } %>
+          </div>
+        <% else %>
+          <div class="field">
+            <label>Domain</label>
+            <div class="read-only-value"><%= ticket.domain.humanize %></div>
+          </div>
+        <% end %>
 
-        <div class="field">
-          <%= form.label :assigned_to_id, "Assigned to" %>
-          <%= form.select :assigned_to_id, options_for_select([["Unassigned", nil]] + @assignable_users.map { |user| ["#{user.name} (#{user.display_role})", user.id] }, ticket.assigned_to_id) %>
-        </div>
+        <% if @ticket_policy.can_edit_attribute?(:assigned_to_id) %>
+          <div class="field">
+            <%= form.label :assigned_to_id, "Assigned to" %>
+            <%= form.select :assigned_to_id, options_for_select([["Unassigned", nil]] + @assignable_users.map { |user| ["#{user.name} (#{user.display_role})", user.id] }, ticket.assigned_to_id) %>
+          </div>
+        <% else %>
+          <div class="field">
+            <label>Assigned to</label>
+            <div class="read-only-value"><%= ticket.assigned_to ? "#{ticket.assigned_to.name} (#{ticket.assigned_to.display_role})" : "Unassigned" %></div>
+          </div>
+        <% end %>
       </div>
     </section>
 
@@ -69,10 +111,17 @@
       </div>
 
       <div class="form-grid">
-        <div class="field field--span-2">
-          <%= form.label :external_reference %>
-          <%= form.text_field :external_reference, placeholder: "Optional external ID, issue link, or imported reference" %>
-        </div>
+        <% if @ticket_policy.can_edit_attribute?(:external_reference) %>
+          <div class="field field--span-2">
+            <%= form.label :external_reference %>
+            <%= form.text_field :external_reference, placeholder: "Optional external ID, issue link, or imported reference" %>
+          </div>
+        <% else %>
+          <div class="field field--span-2">
+            <label>External reference</label>
+            <div class="read-only-value"><%= ticket.external_reference.presence || "None" %></div>
+          </div>
+        <% end %>
       </div>
     </section>
   </div>

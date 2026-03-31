@@ -21,36 +21,67 @@
     </div>
   </div>
 
-  <%= form_with model: ticket.gate_two, url: ticket_gate_two_path(ticket), method: :patch, class: "ticket-form" do |form| %>
-    <div class="form-grid form-grid--gates">
-      <div class="field field--span-2">
-        <%= form.label :root_cause %>
-        <%= form.text_area :root_cause, rows: 5, placeholder: "Explain the technical cause in plain language." %>
+  <% if @ticket_policy.update_gate_two? %>
+    <%= form_with model: ticket.gate_two, url: ticket_gate_two_path(ticket), method: :patch, class: "ticket-form" do |form| %>
+      <div class="form-grid form-grid--gates">
+        <div class="field field--span-2">
+          <%= form.label :root_cause %>
+          <%= form.text_area :root_cause, rows: 5, placeholder: "Explain the technical cause in plain language." %>
+        </div>
+
+        <div class="field field--span-2">
+          <%= form.label :fix_summary %>
+          <%= form.text_area :fix_summary, rows: 5, placeholder: "Describe the code or configuration change that fixes the issue." %>
+        </div>
+
+        <div class="field field--span-2">
+          <%= form.label :verification_steps %>
+          <%= form.text_area :verification_steps, rows: 4, placeholder: "How was the fix verified?" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :primary_commit_sha %>
+          <%= form.text_field :primary_commit_sha, placeholder: "Optional commit SHA" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :primary_pull_request_url %>
+          <%= form.url_field :primary_pull_request_url, placeholder: "Optional PR URL" %>
+        </div>
       </div>
 
-      <div class="field field--span-2">
-        <%= form.label :fix_summary %>
-        <%= form.text_area :fix_summary, rows: 5, placeholder: "Describe the code or configuration change that fixes the issue." %>
+      <div class="form-actions">
+        <%= form.submit "Save Gate 2", class: "button" %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="read-only-stack">
+      <div class="read-only-block">
+        <label>Root cause</label>
+        <div class="read-only-value read-only-value--multiline"><%= ticket.gate_two.root_cause.presence || "No root cause recorded yet." %></div>
       </div>
 
-      <div class="field field--span-2">
-        <%= form.label :verification_steps %>
-        <%= form.text_area :verification_steps, rows: 4, placeholder: "How was the fix verified?" %>
+      <div class="read-only-block">
+        <label>Fix summary</label>
+        <div class="read-only-value read-only-value--multiline"><%= ticket.gate_two.fix_summary.presence || "No fix summary recorded yet." %></div>
       </div>
 
-      <div class="field">
-        <%= form.label :primary_commit_sha %>
-        <%= form.text_field :primary_commit_sha, placeholder: "Optional commit SHA" %>
+      <div class="read-only-block">
+        <label>Verification steps</label>
+        <div class="read-only-value read-only-value--multiline"><%= ticket.gate_two.verification_steps.presence || "No verification steps recorded yet." %></div>
       </div>
 
-      <div class="field">
-        <%= form.label :primary_pull_request_url %>
-        <%= form.url_field :primary_pull_request_url, placeholder: "Optional PR URL" %>
-      </div>
-    </div>
+      <div class="read-only-block-grid">
+        <div class="read-only-block">
+          <label>Primary commit SHA</label>
+          <div class="read-only-value"><%= ticket.gate_two.primary_commit_sha.presence || "None" %></div>
+        </div>
 
-    <div class="form-actions">
-      <%= form.submit "Save Gate 2", class: "button" %>
+        <div class="read-only-block">
+          <label>Primary PR URL</label>
+          <div class="read-only-value read-only-value--multiline"><%= ticket.gate_two.primary_pull_request_url.presence || "None" %></div>
+        </div>
+      </div>
     </div>
   <% end %>
 </article>

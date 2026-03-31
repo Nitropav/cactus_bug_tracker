@@ -798,6 +798,41 @@ html[data-theme="dark"] .hero-banner {
   margin-bottom: 0.4rem;
 }
 
+.read-only-stack {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.read-only-block-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.read-only-block label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.read-only-value {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-soft) 88%, transparent);
+  color: var(--text);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.read-only-value--multiline {
+  display: block;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
 .field input,
 .field select,
 .field textarea {
@@ -1433,7 +1468,8 @@ html[data-theme="dark"] .hero-banner {
 
   .form-grid,
   .detail-grid,
-  .detail-grid--three-up {
+  .detail-grid--three-up,
+  .read-only-block-grid {
     grid-template-columns: 1fr;
   }
 
