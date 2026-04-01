@@ -66,7 +66,45 @@ class TicketEventLogger
     )
   end
 
+  def self.log_commit_linked!(ticket:, actor:, ticket_commit:)
+    log!(
+      ticket: ticket,
+      actor: actor,
+      event_type: "commit_linked",
+      message: "Linked #{commit_link_message(ticket_commit)}.",
+      metadata: {
+        ticket_commit_id: ticket_commit.id,
+        commit_sha: ticket_commit.commit_sha,
+        pull_request_url: ticket_commit.pull_request_url,
+        repository_name: ticket_commit.repository_name
+      }
+    )
+  end
+
+  def self.log_commit_unlinked!(ticket:, actor:, ticket_commit:)
+    log!(
+      ticket: ticket,
+      actor: actor,
+      event_type: "commit_unlinked",
+      message: "Removed #{commit_link_message(ticket_commit)}.",
+      metadata: {
+        ticket_commit_id: ticket_commit.id,
+        commit_sha: ticket_commit.commit_sha,
+        pull_request_url: ticket_commit.pull_request_url,
+        repository_name: ticket_commit.repository_name
+      }
+    )
+  end
+
   def self.display_status(value)
     Ticket.statuses.invert.fetch(value, value.to_s).to_s.humanize.downcase
+  end
+
+  def self.commit_link_message(ticket_commit)
+    parts = []
+    parts << "commit #{ticket_commit.short_commit_sha}" if ticket_commit.commit_sha.present?
+    parts << "PR" if ticket_commit.pull_request_url.present?
+    parts << "for #{ticket_commit.repository_name}" if ticket_commit.repository_name.present?
+    parts.join(" ").presence || "implementation link"
   end
 end

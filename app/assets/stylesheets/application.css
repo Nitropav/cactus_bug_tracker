@@ -246,6 +246,25 @@ a {
   box-shadow: 0 5px 0 currentColor, 0 10px 0 currentColor;
 }
 
+.sidebar-nav__icon--users::before {
+  width: 7px;
+  height: 7px;
+  top: 6px;
+  left: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sidebar-nav__icon--users::after {
+  width: 12px;
+  height: 6px;
+  left: 8px;
+  bottom: 6px;
+  border-radius: 999px 999px 6px 6px;
+  border: 2px solid currentColor;
+  border-top: 0;
+}
+
 .sidebar-user {
   margin-top: auto;
   display: flex;
@@ -1446,6 +1465,142 @@ html[data-theme="dark"] .hero-banner {
   justify-content: center;
 }
 
+.user-directory {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-filter-form {
+  margin: 1.1rem 0 1.35rem;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+}
+
+.user-card__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.user-card__name {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.user-card__email {
+  margin-top: 0.15rem;
+  color: var(--muted);
+}
+
+.user-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.user-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.form-actions--tight {
+  padding-top: 0.5rem;
+ }
+
+.detail-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-card__description {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  max-width: 64ch;
+}
+
+.detail-card__meta-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ticket-form--compact {
+  margin-bottom: 1.25rem;
+}
+
+.implementation-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.implementation-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+}
+
+.implementation-card__main {
+  min-width: 0;
+  flex: 1;
+}
+
+.implementation-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.implementation-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.implementation-card__meta code {
+  padding: 0.15rem 0.4rem;
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.implementation-card__notes {
+  margin: 0.8rem 0 0;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.implementation-card__actions {
+  display: flex;
+  align-items: center;
+}
+
 @media (max-width: 900px) {
   .shell {
     flex-direction: column;
@@ -1511,5 +1666,24 @@ html[data-theme="dark"] .hero-banner {
 
   .ticket-row__actions {
     justify-content: flex-start;
+  }
+
+  .user-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-card__meta {
+    justify-content: flex-start;
+  }
+
+  .user-card__actions {
+    justify-content: flex-start;
+  }
+
+  .implementation-card,
+  .detail-card__header {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

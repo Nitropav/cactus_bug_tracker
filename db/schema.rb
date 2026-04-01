@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_31_154600) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_01_130100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_31_154600) do
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_ticket_comments_on_author_id"
     t.index ["ticket_id"], name: "index_ticket_comments_on_ticket_id"
+  end
+
+  create_table "ticket_commits", force: :cascade do |t|
+    t.bigint "ticket_id", null: false
+    t.bigint "author_id"
+    t.string "commit_sha"
+    t.string "pull_request_url"
+    t.string "repository_name"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_ticket_commits_on_author_id"
+    t.index ["ticket_id", "commit_sha"], name: "index_ticket_commits_on_ticket_id_and_commit_sha", unique: true, where: "(commit_sha IS NOT NULL)"
+    t.index ["ticket_id"], name: "index_ticket_commits_on_ticket_id"
   end
 
   create_table "ticket_events", force: :cascade do |t|
@@ -84,6 +98,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_31_154600) do
     t.index ["status"], name: "index_tickets_on_status"
   end
 
+  create_table "user_events", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "actor_id"
+    t.string "event_type", null: false
+    t.text "message", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_user_events_on_actor_id"
+    t.index ["event_type"], name: "index_user_events_on_event_type"
+    t.index ["user_id", "created_at"], name: "index_user_events_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_user_events_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
@@ -92,15 +120,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_31_154600) do
     t.datetime "last_seen_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "deactivated_at"
+    t.index ["active"], name: "index_users_on_active"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "ticket_comments", "tickets"
   add_foreign_key "ticket_comments", "users", column: "author_id"
+  add_foreign_key "ticket_commits", "tickets"
+  add_foreign_key "ticket_commits", "users", column: "author_id"
   add_foreign_key "ticket_events", "tickets"
   add_foreign_key "ticket_events", "users", column: "actor_id"
   add_foreign_key "ticket_gate_ones", "tickets"
   add_foreign_key "ticket_gate_twos", "tickets"
   add_foreign_key "tickets", "users", column: "assigned_to_id"
   add_foreign_key "tickets", "users", column: "reported_by_id"
+  add_foreign_key "user_events", "users"
+  add_foreign_key "user_events", "users", column: "actor_id"
 end

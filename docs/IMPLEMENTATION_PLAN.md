@@ -24,9 +24,9 @@ The following is already implemented:
 - Docker-based local development setup
 - PostgreSQL-backed app booting in Docker
 - `User` model with roles:
-  - `reporter`
+  - `customer`
   - `developer`
-  - `reviewer`
+  - `support_agent`
   - `admin`
 - login/logout and `current_user`
 - seeded development users
@@ -45,8 +45,9 @@ What is still missing is the real product workflow: permissions, transitions, tr
 
 - `Phase 1: Workflow Enforcement` -> core implementation complete
 - `Phase 2: Role Permissions` -> ticket-level implementation mostly complete
+- `Phase 3: Commit and PR Linking` -> complete
 - `Phase 7: Workflow Polish and Data Integrity` -> partially complete through comments/events ordering, filtering, and better event payload UX
-- Next recommended build phase -> `Phase 3: Commit and PR Linking`
+- Next recommended build phase -> `Phase 4: Training Example Model`
 
 ---
 
@@ -54,13 +55,13 @@ What is still missing is the real product workflow: permissions, transitions, tr
 
 The intended end-to-end flow is:
 
-1. Reporter creates a ticket.
-2. Reporter fills `Gate 1`.
+1. Customer or support agent creates a ticket.
+2. Customer-side `Gate 1` is filled.
 3. Ticket moves into active work.
 4. Developer investigates and fills `Gate 2`.
 5. Ticket is resolved/closed only when both gates are complete.
 6. A `TrainingExample` is generated from the resolved ticket.
-7. Reviewer approves or rejects the training example.
+7. Developer or admin approves or rejects the training example.
 8. Only approved examples are exported to `JSONL`.
 
 That is the core workflow the backend should enforce.
@@ -147,14 +148,14 @@ Enforce who can do what.
 
 ### Required Role Model
 
-- `reporter`
+- `customer`
 - `developer`
-- `reviewer`
+- `support_agent`
 - `admin`
 
 ### Minimum Permission Rules
 
-#### Reporter
+#### Customer
 
 - can create tickets
 - can edit own ticket content while ticket is still in early stages
@@ -170,9 +171,11 @@ Enforce who can do what.
 - can move ticket through active work stages
 - can add commit references
 
-#### Reviewer
+#### Support Agent
 
-- can review and approve/reject generated training examples
+- can create and triage tickets
+- can help complete `Gate 1`
+- can update ticket metadata and assignment
 - can comment on tickets
 - can inspect gates and resolution details
 
@@ -205,7 +208,7 @@ Enforce who can do what.
 
 ## 7. Phase 3: Commit and PR Linking
 
-**Status:** Not started
+**Status:** Complete
 
 ### Goal
 
@@ -230,16 +233,22 @@ Suggested fields:
 
 ### Implementation Tasks
 
-- [ ] Create `TicketCommit` model and migration
-- [ ] Allow multiple linked commits per ticket
-- [ ] Build simple UI on ticket show page
-- [ ] Keep `primary_commit_sha` in `Gate 2` if useful, but prefer dedicated linked records for extensibility
+- [x] Create `TicketCommit` model and migration
+- [x] Allow multiple linked commits per ticket
+- [x] Build simple UI on ticket show page
+- [x] Keep `primary_commit_sha` in `Gate 2` if useful, but prefer dedicated linked records for extensibility
 
 ### Acceptance Criteria
 
 - a ticket can have one or more linked commits
 - linked commits are visible on ticket show
 - training example generation can read commit data
+
+### Notes
+
+- `TicketCommit` now captures manual commit SHA and PR evidence on the ticket itself.
+- Only `developer` and `admin` can add or remove implementation links.
+- Linking and unlinking commits/PRs is recorded in the ticket activity feed.
 
 ---
 
@@ -284,7 +293,7 @@ Suggested fields:
   - severity
   - domain
   - status
-  - reporter/assignee
+  - customer/assignee
 
 ### Implementation Tasks
 
@@ -324,13 +333,13 @@ Introduce human validation before export.
   - `approve`
   - `reject`
 - [ ] Filter queue by state
-- [ ] Restrict access to `reviewer` and `admin`
+- [ ] Restrict access to `developer` and `admin`
 - [ ] Log review decisions in ticket events or training example events
 
 ### Acceptance Criteria
 
-- reviewer can inspect generated examples
-- reviewer can approve or reject
+- developer can inspect generated examples
+- developer can approve or reject
 - export uses approved examples only
 
 ---
@@ -473,7 +482,7 @@ This is the order we should actually follow:
 
 ### Step 3
 
-- [ ] Commit/PR linking
+- [x] Commit/PR linking
 
 ### Step 4
 
@@ -503,20 +512,20 @@ This is the order we should actually follow:
 
 The next implementation task should be:
 
-### Commit / PR Linking
+### TrainingExample model
 
 Specifically:
 
-- create `TicketCommit` model and migration
-- allow multiple linked commits per ticket
-- expose commit links on ticket show
-- make linked commit data readable by future `TrainingExample` builder
+- create `TrainingExample` model and migration
+- add a builder service that reads ticket metadata, gates, comments, events, and linked implementation references
+- generate a draft training example when a ticket reaches `resolved` or `closed`
+- make the draft visible in the app for later developer/admin approval or rejection
 
 This is the right next step because:
 
 - workflow and role restrictions are already in place for tickets
-- the next missing source of structured resolution evidence is commit/PR linkage
-- `TrainingExample` should read both gates and implementation references
+- implementation evidence can now be linked directly on the ticket
+- the next missing product layer is turning resolved tickets into reviewable training data
 
 ---
 
@@ -540,11 +549,11 @@ The correct near-term priority is:
 
 The MVP should be considered done when:
 
-- a reporter can create a ticket
+- a customer can create a ticket
 - `Gate 1` and `Gate 2` are enforced
 - roles are respected
 - developer can link commits/PRs
-- reviewer can approve/reject training examples
+- developer can approve/reject training examples
 - approved examples can be exported to JSONL
 
 At that point the application is already valuable even before AI is connected.

@@ -1,0 +1,33 @@
+<article class="detail-card detail-card--soft">
+  <div class="detail-card__eyebrow">Audit</div>
+  <div class="feed-header">
+    <div>
+      <h2>User activity</h2>
+      <p class="detail-muted">Admin-facing history for account creation, updates, password resets, and activation changes.</p>
+    </div>
+    <span class="list-pill"><%= user_events.size %> visible</span>
+  </div>
+
+  <% if user_events.any? %>
+    <div class="timeline">
+      <% user_events.each do |event| %>
+        <div class="timeline__item">
+          <div class="timeline__meta">
+            <div class="timeline__identity">
+              <span class="event-badge event-badge--<%= event.badge_modifier %>"><%= event.badge_label %></span>
+              <strong><%= event.actor&.name || "System" %></strong>
+            </div>
+            <div class="timeline__timestamps">
+              <span><%= time_ago_in_words(event.created_at) %> ago</span>
+              <span><%= event.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+            </div>
+          </div>
+          <div class="timeline__label"><%= event.event_type.humanize %></div>
+          <div class="timeline__body"><%= event.message %></div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="detail-muted">No audit events yet.</p>
+  <% end %>
+</article>

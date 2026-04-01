@@ -56,6 +56,13 @@
               <span class="sidebar-nav__icon sidebar-nav__icon--tickets" aria-hidden="true"></span>
               <span>Tickets</span>
             <% end %>
+
+            <% if current_user.role_admin? %>
+              <%= link_to users_path, class: "sidebar-nav__link #{'sidebar-nav__link--active' if request.path.start_with?('/users')}" do %>
+                <span class="sidebar-nav__icon sidebar-nav__icon--users" aria-hidden="true"></span>
+                <span>Users</span>
+              <% end %>
+            <% end %>
           </nav>
 
           <div class="sidebar-user">

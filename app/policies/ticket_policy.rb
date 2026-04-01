@@ -15,30 +15,30 @@ class TicketPolicy
   end
 
   def create?
-    user.present? && !reviewer?
+    user.present?
   end
 
   def update?
     return false unless user.present?
     return true if admin?
     return true if developer?
-    return true if reviewer?
+    return true if support_agent?
 
-    reporter_can_edit_ticket?
+    customer_can_edit_ticket?
   end
 
   def destroy?
     return false unless user.present?
     return true if admin?
 
-    reporter_can_delete_ticket?
+    customer_can_delete_ticket?
   end
 
   def update_gate_one?
     return false unless user.present?
-    return true if admin? || developer?
+    return true if admin? || developer? || support_agent?
 
-    reporter_can_edit_ticket?
+    customer_can_edit_ticket?
   end
 
   def update_gate_two?
@@ -51,10 +51,19 @@ class TicketPolicy
     user.present?
   end
 
+  def view_commits?
+    user.present?
+  end
+
+  def manage_commits?
+    return false unless user.present?
+
+    admin? || developer?
+  end
+
   def permitted_attributes
-    return %i[title summary status severity domain assigned_to_id external_reference] if admin? || developer?
-    return %i[status] if reviewer?
-    return %i[title summary status domain external_reference] if reporter_can_edit_ticket?
+    return %i[title summary status severity domain assigned_to_id external_reference] if admin? || developer? || support_agent?
+    return %i[title summary status domain external_reference] if customer_can_edit_ticket?
 
     []
   end
@@ -72,9 +81,9 @@ class TicketPolicy
     case
     when developer?
       %w[draft needs_info open in_progress needs_review resolved].include?(target_status)
-    when reviewer?
-      %w[needs_review resolved closed].include?(target_status)
-    when reporter_can_edit_ticket?
+    when support_agent?
+      %w[draft needs_info open in_progress needs_review closed].include?(target_status)
+    when customer_can_edit_ticket?
       %w[draft needs_info].include?(target_status)
     else
       false
@@ -99,24 +108,24 @@ class TicketPolicy
     user&.role_developer?
   end
 
-  def reviewer?
-    user&.role_reviewer?
+  def support_agent?
+    user&.role_support_agent?
   end
 
-  def reporter?
-    user&.role_reporter?
+  def customer?
+    user&.role_customer?
   end
 
   def owns_ticket?
     ticket.reported_by_id.present? && ticket.reported_by_id == user.id
   end
 
-  def reporter_can_edit_ticket?
-    reporter? && owns_ticket? && ticket.status.in?(%w[draft needs_info])
+  def customer_can_edit_ticket?
+    customer? && owns_ticket? && ticket.status.in?(%w[draft needs_info])
   end
 
-  def reporter_can_delete_ticket?
-    reporter? && owns_ticket? && ticket.status.in?(%w[draft needs_info])
+  def customer_can_delete_ticket?
+    customer? && owns_ticket? && ticket.status.in?(%w[draft needs_info])
   end
 
   def transition_allowed_from?(from_status, target_status)

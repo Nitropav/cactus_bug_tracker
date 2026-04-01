@@ -8,9 +8,12 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(email: params[:email].to_s.strip.downcase)
 
-    if user&.authenticate(params[:password].to_s)
+    if user&.active? && user.authenticate(params[:password].to_s)
       sign_in(user)
       redirect_to after_authentication_path, notice: "Signed in successfully."
+    elsif user.present? && !user.active?
+      flash.now[:alert] = "This account has been disabled. Please contact an administrator."
+      render :new, status: :unprocessable_entity
     else
       flash.now[:alert] = "Invalid email or password."
       render :new, status: :unprocessable_entity

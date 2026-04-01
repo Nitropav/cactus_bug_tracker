@@ -1,0 +1,36 @@
+<% content_for :title, "New user" %>
+
+<main class="page">
+  <section class="hero-banner hero-banner--ticket">
+    <div>
+      <div class="hero-banner__eyebrow">Admin workspace</div>
+      <h1>New user</h1>
+      <p class="page-subtitle">Create a new account and assign the correct product role up front.</p>
+
+      <div class="hero-banner__meta">
+        <span class="mini-ticket__domain">Default role: <%= @user.display_role %></span>
+      </div>
+    </div>
+
+    <div class="hero-banner__actions hero-banner__actions--stacked">
+      <div class="ticket-show__stats">
+        <div class="ticket-show__stat">
+          <span>Created by</span>
+          <strong><%= current_user.name %></strong>
+        </div>
+        <div class="ticket-show__stat">
+          <span>Available roles</span>
+          <strong><%= User.roles.keys.size %></strong>
+        </div>
+      </div>
+
+      <div class="page-header__actions">
+        <%= link_to "All users", users_path, class: "button button--secondary" %>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface ticket-section-gap">
+    <%= render "form", user: @user %>
+  </section>
+</main>

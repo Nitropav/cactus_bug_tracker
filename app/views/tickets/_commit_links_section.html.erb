@@ -1,0 +1,97 @@
+<% persisted_commit_links = ticket.ticket_commits.select(&:persisted?) %>
+
+<article id="implementation-links" class="detail-card detail-card--soft detail-card--wide">
+  <div class="detail-card__eyebrow">Implementation evidence</div>
+  <div class="detail-card__header">
+    <div>
+      <h2>Commit and PR links</h2>
+      <p class="detail-card__description">Attach the implementation references that support the eventual training example and review flow.</p>
+    </div>
+    <div class="detail-card__meta-actions">
+      <span class="list-pill"><%= pluralize(persisted_commit_links.size, "link") %></span>
+      <% if @ticket_policy.manage_commits? %>
+        <span class="gate-state gate-state--complete">Developer editable</span>
+      <% else %>
+        <span class="gate-state gate-state--pending">Read only</span>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @ticket_policy.manage_commits? %>
+    <%= form_with model: new_ticket_commit, url: ticket_commit_links_path(ticket), class: "ticket-form ticket-form--compact" do |form| %>
+      <div class="form-section-grid form-section-grid--three-up">
+        <div class="field">
+          <%= form.label :commit_sha, "Commit SHA" %>
+          <%= form.text_field :commit_sha, placeholder: "a1b2c3d4" %>
+        </div>
+        <div class="field">
+          <%= form.label :pull_request_url, "Pull request URL" %>
+          <%= form.url_field :pull_request_url, placeholder: "https://github.com/org/repo/pull/123" %>
+        </div>
+        <div class="field">
+          <%= form.label :repository_name, "Repository" %>
+          <%= form.text_field :repository_name, placeholder: "cactus-bug-tracker" %>
+        </div>
+      </div>
+
+      <div class="field">
+        <%= form.label :notes, "Notes" %>
+        <%= form.text_area :notes, rows: 3, placeholder: "What changed in this commit or PR?" %>
+      </div>
+
+      <div class="ticket-form__actions">
+        <%= form.submit "Add implementation link", class: "button" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="implementation-list">
+    <% if persisted_commit_links.any? %>
+      <% persisted_commit_links.each do |ticket_commit| %>
+        <article class="implementation-card">
+          <div class="implementation-card__main">
+            <div class="implementation-card__title-row">
+              <strong><%= ticket_commit.label %></strong>
+              <% if ticket_commit.repository_name.present? %>
+                <span class="mini-ticket__domain"><%= ticket_commit.repository_name %></span>
+              <% end %>
+            </div>
+
+            <div class="implementation-card__meta">
+              <% if ticket_commit.commit_sha.present? %>
+                <span>SHA: <code><%= ticket_commit.commit_sha %></code></span>
+              <% end %>
+              <% if ticket_commit.pull_request_url.present? %>
+                <span>
+                  PR:
+                  <%= link_to "Open link", ticket_commit.pull_request_url, target: "_blank", rel: "noopener" %>
+                </span>
+              <% end %>
+              <span>Added by <%= ticket_commit.author&.name || "Unknown" %></span>
+              <span><%= ticket_commit.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+            </div>
+
+            <% if ticket_commit.notes.present? %>
+              <p class="implementation-card__notes"><%= ticket_commit.notes %></p>
+            <% end %>
+          </div>
+
+          <% if @ticket_policy.manage_commits? %>
+            <div class="implementation-card__actions">
+              <%= button_to "Remove",
+                            ticket_commit_link_path(ticket, ticket_commit),
+                            method: :delete,
+                            form: { data: { turbo_confirm: "Remove this implementation link?" } },
+                            class: "button button--secondary button--small" %>
+            </div>
+          <% end %>
+        </article>
+      <% end %>
+    <% else %>
+      <div class="empty-card empty-card--compact">
+        <h3>No implementation links yet</h3>
+        <p>Attach commit SHAs or PR URLs here so the future training example can point back to the actual fix.</p>
+      </div>
+    <% end %>
+  </div>
+</article>

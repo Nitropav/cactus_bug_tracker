@@ -95,6 +95,12 @@
     <%= render "gate_two_form", ticket: @ticket %>
   </section>
 
+  <% if @ticket_policy.view_commits? %>
+    <section class="detail-grid detail-grid--stacked ticket-section-gap">
+      <%= render "commit_links_section", ticket: @ticket, new_ticket_commit: @new_ticket_commit %>
+    </section>
+  <% end %>
+
   <section class="detail-grid ticket-section-gap">
     <% if @ticket_policy.comment? %>
       <%= render "comment_form", ticket: @ticket, new_comment: @new_comment %>

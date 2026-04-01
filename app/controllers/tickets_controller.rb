@@ -109,9 +109,18 @@ class TicketsController < ApplicationController
   private
 
   def set_ticket
-    @ticket = Ticket.includes(:reported_by, :assigned_to, :gate_one, :gate_two, comments: :author, events: :actor).find(params[:id])
+    @ticket = Ticket.includes(
+      :reported_by,
+      :assigned_to,
+      :gate_one,
+      :gate_two,
+      { comments: :author },
+      { events: :actor },
+      { ticket_commits: :author }
+    ).find(params[:id])
     @ticket_policy = ticket_policy(@ticket)
     @new_comment = @ticket.comments.build
+    @new_ticket_commit = TicketCommit.new(ticket_id: @ticket.id)
     @event_filter = normalized_event_filter
     @event_order = normalized_order_param(params[:event_order], default: "newest")
     @comment_order = normalized_order_param(params[:comment_order], default: "newest")

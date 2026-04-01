@@ -1,0 +1,125 @@
+<% content_for :title, "Users" %>
+
+<main class="page">
+  <section class="hero-banner hero-banner--ticket">
+    <div>
+      <div class="hero-banner__eyebrow">Admin workspace</div>
+      <h1>Users</h1>
+      <p class="page-subtitle">Create and review the accounts that can access the bug tracker workflow.</p>
+
+      <div class="hero-banner__meta">
+        <span class="list-pill"><strong><%= @users.count %></strong> users</span>
+        <span class="mini-ticket__domain">Roles: <%= User.roles.keys.map(&:humanize).join(", ") %></span>
+      </div>
+    </div>
+
+    <div class="hero-banner__actions">
+      <%= link_to "New user", new_user_path, class: "button" %>
+    </div>
+  </section>
+
+  <section class="surface ticket-section-gap">
+    <div class="list-toolbar">
+      <div>
+        <div class="list-toolbar__eyebrow">Filters</div>
+        <h2>User directory</h2>
+        <p>Search by name or email, then narrow the list by role or current account state.</p>
+      </div>
+
+      <div class="list-toolbar__summary">
+        <span class="list-pill"><strong><%= @all_users.count %></strong> total</span>
+        <span class="list-pill"><strong><%= @users.count %></strong> matching</span>
+        <span class="list-pill"><strong><%= @all_users.count(&:active?) %></strong> active</span>
+      </div>
+    </div>
+
+    <%= form_with url: users_path, method: :get, class: "admin-filter-form", local: true do |form| %>
+      <div class="form-grid">
+        <div class="field">
+          <%= form.label :q, "Search" %>
+          <%= form.text_field :q, value: @query, placeholder: "Name or email" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :role, "Role" %>
+          <%= form.select :role, options_for_select([["All roles", ""]] + User.roles.keys.map { |role| [role.humanize, role] }, @role_filter) %>
+        </div>
+
+        <div class="field">
+          <%= form.label :state, "State" %>
+          <%= form.select :state, options_for_select([["All states", ""], ["Active", "active"], ["Inactive", "inactive"]], @state_filter) %>
+        </div>
+      </div>
+
+      <div class="form-actions form-actions--tight">
+        <%= form.submit "Apply filters", class: "button" %>
+        <%= link_to "Reset", users_path, class: "button button--secondary" %>
+      </div>
+    <% end %>
+
+    <% if @users.any? %>
+      <div class="list-toolbar">
+        <div>
+          <div class="list-toolbar__eyebrow">Directory</div>
+          <h2>All users</h2>
+          <p>Admin-managed accounts for customers, support, developers, and administrators.</p>
+        </div>
+
+        <div class="list-toolbar__summary">
+          <% User.roles.keys.each do |role| %>
+            <span class="list-pill"><strong><%= @users.count { |user| user.role == role } %></strong> <%= role.humanize %></span>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="user-directory">
+        <% @users.each do |user| %>
+          <article class="user-card">
+            <div class="user-card__identity">
+              <div class="sidebar-user__avatar"><%= user.name.first.upcase %></div>
+              <div>
+                <div class="user-card__name"><%= user.name %></div>
+                <div class="user-card__email"><%= user.email %></div>
+              </div>
+            </div>
+
+            <div class="user-card__meta">
+              <span class="status-pill status-pill--<%= user.role == "admin" ? "resolved" : "open" %>"><%= user.display_role %></span>
+              <span class="gate-state gate-state--<%= user.active? ? "complete" : "pending" %>"><%= user.display_state %></span>
+              <span class="detail-muted">Seen: <%= user.last_seen_at ? "#{time_ago_in_words(user.last_seen_at)} ago" : "Never" %></span>
+              <span class="detail-muted">Created: <%= user.created_at.strftime("%Y-%m-%d") %></span>
+              <% if (last_event = user.user_events.recent_first.first) %>
+                <span class="detail-muted">Last audit: <%= last_event.badge_label %></span>
+              <% end %>
+            </div>
+
+            <div class="user-card__actions">
+              <%= link_to "Edit", edit_user_path(user), class: "button button--secondary button--small" %>
+              <%= link_to "Reset password", reset_password_user_path(user), class: "button button--secondary button--small" %>
+              <% if user.active? %>
+                <% unless user == current_user %>
+                  <%= button_to "Deactivate",
+                                deactivate_user_path(user),
+                                method: :patch,
+                                form: { data: { turbo_confirm: "Deactivate this user?" } },
+                                class: "button button--secondary button--small" %>
+                <% end %>
+              <% else %>
+                <%= button_to "Reactivate",
+                              reactivate_user_path(user),
+                              method: :patch,
+                              class: "button button--secondary button--small" %>
+              <% end %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <h2>No users yet</h2>
+        <p>Create the first user account to let someone into the workspace.</p>
+        <%= link_to "Create user", new_user_path, class: "button" %>
+      </div>
+    <% end %>
+  </section>
+</main>

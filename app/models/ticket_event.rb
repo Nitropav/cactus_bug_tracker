@@ -3,6 +3,7 @@ class TicketEvent < ApplicationRecord
     "all" => nil,
     "workflow" => %w[ticket_created ticket_updated status_changed],
     "gates" => %w[gate_one_updated gate_two_updated],
+    "implementation" => %w[commit_linked commit_unlinked],
     "discussion" => %w[comment_created]
   }.freeze
 
@@ -34,6 +35,8 @@ class TicketEvent < ApplicationRecord
     when "status_changed" then "Status"
     when "gate_one_updated" then "Gate 1"
     when "gate_two_updated" then "Gate 2"
+    when "commit_linked" then "Commit"
+    when "commit_unlinked" then "Commit"
     when "comment_created" then "Comment"
     else
       event_type.humanize

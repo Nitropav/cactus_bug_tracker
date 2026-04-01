@@ -1,0 +1,69 @@
+<% submit_label = local_assigns.fetch(:submit_label, user.persisted? ? "Save changes" : "Create user") %>
+<% include_password_fields = local_assigns.fetch(:include_password_fields, !user.persisted?) %>
+
+<%= form_with model: user, class: "ticket-form" do |form| %>
+  <% if user.errors.any? %>
+    <div class="flash flash--alert">
+      <strong><%= pluralize(user.errors.count, "error") %> prevented this user from saving:</strong>
+      <ul>
+        <% user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-shell">
+    <section class="form-section">
+      <div class="form-section__header">
+        <div class="detail-card__eyebrow">Identity</div>
+        <h2>Account basics</h2>
+        <p class="detail-muted">Capture the person's name, sign-in email, and the role they should have in the product.</p>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <%= form.label :name %>
+          <%= form.text_field :name, required: true, placeholder: "Jane Doe" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :email %>
+          <%= form.email_field :email, required: true, autocomplete: "email", placeholder: "jane@example.com" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :role %>
+          <%= form.select :role, User.roles.keys.map { |role| [role.humanize, role] } %>
+        </div>
+      </div>
+    </section>
+
+    <% if include_password_fields %>
+      <section class="form-section">
+        <div class="form-section__header">
+          <div class="detail-card__eyebrow">Credentials</div>
+          <h2>Password setup</h2>
+          <p class="detail-muted">Set the initial password. The user can change it later when that flow exists.</p>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <%= form.label :password %>
+            <%= form.password_field :password, required: true, autocomplete: "new-password" %>
+          </div>
+
+          <div class="field">
+            <%= form.label :password_confirmation %>
+            <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password" %>
+          </div>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit submit_label, class: "button" %>
+    <%= link_to "Cancel", users_path, class: "button button--secondary" %>
+  </div>
+<% end %>
