@@ -12,6 +12,7 @@ class TicketGateOnesController < ApplicationController
         complete: @ticket.gate_one.complete?,
         changed_fields: @ticket.gate_one.saved_changes.keys - %w[updated_at completed_at]
       )
+      sync_training_example_for(@ticket)
       redirect_to @ticket, notice: gate_notice(@ticket.gate_one.complete?, "Gate 1")
     else
       redirect_to @ticket, alert: "Gate 1 could not be updated."

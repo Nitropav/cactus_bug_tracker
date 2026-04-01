@@ -57,6 +57,13 @@
               <span>Tickets</span>
             <% end %>
 
+            <% if current_user.can_review? %>
+              <%= link_to training_examples_path, class: "sidebar-nav__link #{'sidebar-nav__link--active' if request.path.start_with?('/training_examples')}" do %>
+                <span class="sidebar-nav__icon sidebar-nav__icon--training" aria-hidden="true"></span>
+                <span>Training</span>
+              <% end %>
+            <% end %>
+
             <% if current_user.role_admin? %>
               <%= link_to users_path, class: "sidebar-nav__link #{'sidebar-nav__link--active' if request.path.start_with?('/users')}" do %>
                 <span class="sidebar-nav__icon sidebar-nav__icon--users" aria-hidden="true"></span>

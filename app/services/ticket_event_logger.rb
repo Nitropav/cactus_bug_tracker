@@ -96,6 +96,32 @@ class TicketEventLogger
     )
   end
 
+  def self.log_training_example_generated!(ticket:, actor:, training_example:, created:)
+    log!(
+      ticket: ticket,
+      actor: actor,
+      event_type: "training_example_generated",
+      message: "#{created ? 'Generated' : 'Refreshed'} training example draft ##{training_example.id}.",
+      metadata: {
+        training_example_id: training_example.id,
+        status: training_example.status
+      }
+    )
+  end
+
+  def self.log_training_example_reviewed!(ticket:, actor:, training_example:, status:)
+    log!(
+      ticket: ticket,
+      actor: actor,
+      event_type: "training_example_#{status}",
+      message: "Training example ##{training_example.id} #{status.to_s.humanize.downcase}.",
+      metadata: {
+        training_example_id: training_example.id,
+        status: status
+      }
+    )
+  end
+
   def self.display_status(value)
     Ticket.statuses.invert.fetch(value, value.to_s).to_s.humanize.downcase
   end

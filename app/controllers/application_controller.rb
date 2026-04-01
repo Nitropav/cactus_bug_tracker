@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   include Authentication
 
   before_action :authenticate_user!
-  helper_method :ticket_creation_policy
+  helper_method :ticket_creation_policy, :training_example_policy
 
   private
 
@@ -17,7 +17,19 @@ class ApplicationController < ActionController::Base
     @ticket_creation_policy ||= TicketPolicy.new(current_user, current_user&.reported_tickets&.build || Ticket.new)
   end
 
+  def training_example_policy(training_example)
+    TrainingExamplePolicy.new(current_user, training_example)
+  end
+
   def deny_access!(message = "You do not have access to that action.")
     redirect_back fallback_location: root_path, alert: message
+  end
+
+  def sync_training_example_for(ticket)
+    return unless ticket.status_resolved? || ticket.status_closed?
+
+    TrainingExampleBuilder.call(ticket: ticket, actor: current_user)
+  rescue StandardError => error
+    Rails.logger.error("Training example sync failed for ticket #{ticket.id}: #{error.class}: #{error.message}")
   end
 end

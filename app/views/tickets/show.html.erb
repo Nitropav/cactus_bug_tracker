@@ -101,6 +101,35 @@
     </section>
   <% end %>
 
+  <% if current_user.can_review? && @latest_training_example.present? %>
+    <section class="detail-grid detail-grid--stacked ticket-section-gap">
+      <article class="detail-card detail-card--soft">
+        <div class="detail-card__eyebrow">Training pipeline</div>
+        <div class="detail-card__header">
+          <div>
+            <h2>Latest training example</h2>
+            <p class="detail-card__description">Resolved tickets generate a draft example that can be reviewed before export.</p>
+          </div>
+          <div class="detail-card__meta-actions">
+            <span class="status-pill status-pill--<%= @latest_training_example.status_pending_review? ? "needs_review" : "resolved" %>"><%= @latest_training_example.display_status %></span>
+          </div>
+        </div>
+
+        <dl class="detail-list">
+          <dt>Generated</dt>
+          <dd><%= @latest_training_example.generated_timestamp.strftime("%Y-%m-%d %H:%M") %></dd>
+          <dt>Reviewed by</dt>
+          <dd><%= @latest_training_example.reviewed_by&.name || "Not reviewed yet" %></dd>
+        </dl>
+
+        <div class="ticket-form__actions">
+          <%= link_to "Open training example", training_example_path(@latest_training_example), class: "button" %>
+          <%= link_to "Training queue", training_examples_path, class: "button button--secondary" %>
+        </div>
+      </article>
+    </section>
+  <% end %>
+
   <section class="detail-grid ticket-section-gap">
     <% if @ticket_policy.comment? %>
       <%= render "comment_form", ticket: @ticket, new_comment: @new_comment %>

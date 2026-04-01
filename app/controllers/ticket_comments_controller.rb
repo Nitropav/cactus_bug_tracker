@@ -8,6 +8,7 @@ class TicketCommentsController < ApplicationController
 
     if @comment.save
       TicketEventLogger.log_comment_created!(ticket: @ticket, actor: current_user, comment: @comment)
+      sync_training_example_for(@ticket)
       redirect_to ticket_path(@ticket, anchor: "comments"), notice: "Comment added."
     else
       redirect_to ticket_path(@ticket, anchor: "comments"), alert: "Comment could not be added."

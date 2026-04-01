@@ -14,6 +14,15 @@ Rails.application.routes.draw do
       patch :reactivate
     end
   end
+  resources :training_examples, only: %i[index show] do
+    collection do
+      get :export
+    end
+    member do
+      patch :approve
+      patch :reject
+    end
+  end
   resources :tickets do
     resource :gate_one, only: :update, controller: "ticket_gate_ones"
     resource :gate_two, only: :update, controller: "ticket_gate_twos"

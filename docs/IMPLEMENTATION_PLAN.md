@@ -39,15 +39,18 @@ The following is already implemented:
 
 This means the app already has the shell of the product.
 
-What is still missing is the real product workflow: permissions, transitions, training examples, review, and export.
+What is still missing is the export and integration layer: JSONL export, automation, and AI assistance.
 
 ### Progress Snapshot
 
 - `Phase 1: Workflow Enforcement` -> core implementation complete
 - `Phase 2: Role Permissions` -> ticket-level implementation mostly complete
 - `Phase 3: Commit and PR Linking` -> complete
+- `Phase 4: Training Example Model` -> complete
+- `Phase 5: Reviewer Queue` -> basic implementation complete
+- `Phase 6: JSONL Export` -> complete
 - `Phase 7: Workflow Polish and Data Integrity` -> partially complete through comments/events ordering, filtering, and better event payload UX
-- Next recommended build phase -> `Phase 4: Training Example Model`
+- Next recommended build phase -> `Phase 8: External Integrations`
 
 ---
 
@@ -202,7 +205,8 @@ Enforce who can do what.
 
 - Ticket creation, editing, destruction, comments, `Gate 1`, `Gate 2`, and status changes are now role-aware.
 - UI is also policy-aware for ticket-level actions.
-- `training_example` review/export permissions are still pending because the review/export flow is not built yet.
+- `training_example` access, review queue, and approve/reject flow are now available to `developer` and `admin`.
+- JSONL export is now available to `developer` and `admin`.
 
 ---
 
@@ -254,7 +258,7 @@ Suggested fields:
 
 ## 8. Phase 4: Training Example Model
 
-**Status:** Not started
+**Status:** Complete
 
 ### Goal
 
@@ -297,22 +301,24 @@ Suggested fields:
 
 ### Implementation Tasks
 
-- [ ] Create `TrainingExample` model + migration
-- [ ] Add builder service, for example:
+- [x] Create `TrainingExample` model + migration
+- [x] Add builder service, for example:
   - `app/services/training_example_builder.rb`
-- [ ] Generate draft example when ticket becomes `resolved` or `closed`
-- [ ] Prevent duplicate draft generation per ticket unless explicitly regenerated
+- [x] Generate draft example when ticket becomes `resolved` or `closed`
+- [x] Refresh the pending draft when resolved tickets continue to change
+- [x] Prevent duplicate draft generation per ticket unless explicitly regenerated
 
 ### Acceptance Criteria
 
 - a closed ticket can produce a structured training example
 - training example data is readable and reviewable in-app
+- ticket activity records training example generation
 
 ---
 
 ## 9. Phase 5: Reviewer Queue
 
-**Status:** Not started
+**Status:** Basic implementation complete
 
 ### Goal
 
@@ -326,27 +332,27 @@ Introduce human validation before export.
 
 ### Implementation Tasks
 
-- [ ] Add `TrainingExamplesController`
-- [ ] Add pages:
+- [x] Add `TrainingExamplesController`
+- [x] Add pages:
   - `index`
   - `show`
   - `approve`
   - `reject`
-- [ ] Filter queue by state
-- [ ] Restrict access to `developer` and `admin`
-- [ ] Log review decisions in ticket events or training example events
+- [x] Filter queue by state
+- [x] Restrict access to `developer` and `admin`
+- [x] Log review decisions in ticket events
 
 ### Acceptance Criteria
 
 - developer can inspect generated examples
 - developer can approve or reject
-- export uses approved examples only
+- export uses approved examples only once Phase 6 is added
 
 ---
 
 ## 10. Phase 6: JSONL Export
 
-**Status:** Not started
+**Status:** Complete
 
 ### Goal
 
@@ -380,10 +386,10 @@ Possible fields:
 
 ### Implementation Tasks
 
-- [ ] Create exporter service:
+- [x] Create exporter service:
   - `app/services/training_examples/jsonl_exporter.rb`
-- [ ] Add download action or rake task
-- [ ] Add export timestamp tracking
+- [x] Add download action or rake task
+- [x] Add export timestamp tracking
 - [ ] Decide whether exports are:
   - generated on demand
   - persisted in `storage/exports`
@@ -393,6 +399,7 @@ Possible fields:
 - export contains approved examples only
 - output is valid JSONL
 - export can be re-run safely
+- exported examples receive `exported_at`
 
 ---
 
@@ -486,17 +493,17 @@ This is the order we should actually follow:
 
 ### Step 4
 
-- [ ] TrainingExample model
-- [ ] builder service
+- [x] TrainingExample model
+- [x] builder service
 
 ### Step 5
 
-- [ ] Reviewer queue
-- [ ] approve/reject flow
+- [x] Reviewer queue
+- [x] approve/reject flow
 
 ### Step 6
 
-- [ ] JSONL export
+- [x] JSONL export
 
 ### Step 7
 
@@ -512,20 +519,21 @@ This is the order we should actually follow:
 
 The next implementation task should be:
 
-### TrainingExample model
+### External integrations
 
 Specifically:
 
-- create `TrainingExample` model and migration
-- add a builder service that reads ticket metadata, gates, comments, events, and linked implementation references
-- generate a draft training example when a ticket reaches `resolved` or `closed`
-- make the draft visible in the app for later developer/admin approval or rejection
+- add importer groundwork for legacy task sources
+- decide how commit/PR links will later be synchronized automatically
+- prepare the app for eventual Asana or webhook-driven ingestion
 
 This is the right next step because:
 
 - workflow and role restrictions are already in place for tickets
-- implementation evidence can now be linked directly on the ticket
-- the next missing product layer is turning resolved tickets into reviewable training data
+- resolved tickets already generate training examples
+- reviewers can already approve or reject examples
+- approved examples can now be exported
+- the next missing product layer is automation and ecosystem connectivity
 
 ---
 

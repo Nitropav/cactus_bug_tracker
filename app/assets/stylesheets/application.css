@@ -265,6 +265,24 @@ a {
   border-top: 0;
 }
 
+.sidebar-nav__icon--training::before {
+  width: 14px;
+  height: 14px;
+  top: 7px;
+  left: 7px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+}
+
+.sidebar-nav__icon--training::after {
+  width: 6px;
+  height: 2px;
+  top: 11px;
+  left: 11px;
+  background: currentColor;
+  box-shadow: 0 4px 0 currentColor;
+}
+
 .sidebar-user {
   margin-top: auto;
   display: flex;

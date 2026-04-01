@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_01_130100) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_01_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -98,6 +98,32 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_01_130100) do
     t.index ["status"], name: "index_tickets_on_status"
   end
 
+  create_table "training_examples", force: :cascade do |t|
+    t.bigint "ticket_id", null: false
+    t.bigint "reviewed_by_id"
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.text "problem_description"
+    t.text "reproduction_steps"
+    t.text "expected_behavior"
+    t.text "actual_behavior"
+    t.text "environment_context"
+    t.text "root_cause"
+    t.text "fix_summary"
+    t.text "verification_steps"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "generated_at"
+    t.datetime "reviewed_at"
+    t.datetime "exported_at"
+    t.text "review_notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reviewed_by_id"], name: "index_training_examples_on_reviewed_by_id"
+    t.index ["status"], name: "index_training_examples_on_status"
+    t.index ["ticket_id", "status"], name: "index_training_examples_on_ticket_pending_review", unique: true, where: "(status = 0)"
+    t.index ["ticket_id"], name: "index_training_examples_on_ticket_id"
+  end
+
   create_table "user_events", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "actor_id"
@@ -136,6 +162,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_01_130100) do
   add_foreign_key "ticket_gate_twos", "tickets"
   add_foreign_key "tickets", "users", column: "assigned_to_id"
   add_foreign_key "tickets", "users", column: "reported_by_id"
+  add_foreign_key "training_examples", "tickets"
+  add_foreign_key "training_examples", "users", column: "reviewed_by_id"
   add_foreign_key "user_events", "users"
   add_foreign_key "user_events", "users", column: "actor_id"
 end

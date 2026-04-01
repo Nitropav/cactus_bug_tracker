@@ -32,6 +32,7 @@ class Ticket < ApplicationRecord
   has_many :comments, class_name: "TicketComment", dependent: :destroy, inverse_of: :ticket
   has_many :events, class_name: "TicketEvent", dependent: :destroy, inverse_of: :ticket
   has_many :ticket_commits, -> { recent_first }, dependent: :destroy, inverse_of: :ticket
+  has_many :training_examples, -> { recent_first }, dependent: :destroy, inverse_of: :ticket
 
   validates :title, presence: true
   validates :domain, presence: true, inclusion: { in: DOMAINS }
@@ -63,6 +64,10 @@ class Ticket < ApplicationRecord
 
   def display_severity
     severity.humanize
+  end
+
+  def latest_training_example
+    training_examples.first
   end
 
   def can_transition_to?(target_status)

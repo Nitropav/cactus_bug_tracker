@@ -52,6 +52,7 @@ class TicketsController < ApplicationController
 
     if @ticket.save
       TicketEventLogger.log_ticket_created!(ticket: @ticket, actor: current_user)
+      sync_training_example_for(@ticket)
       redirect_to @ticket, notice: "Ticket created successfully."
     else
       render :new, status: :unprocessable_entity
@@ -93,6 +94,7 @@ class TicketsController < ApplicationController
 
     if @ticket.save
       TicketEventLogger.log_ticket_updated!(ticket: @ticket, actor: current_user, changes: @ticket.saved_changes)
+      sync_training_example_for(@ticket)
       redirect_to @ticket, notice: "Ticket updated successfully."
     else
       render :edit, status: :unprocessable_entity
@@ -114,13 +116,15 @@ class TicketsController < ApplicationController
       :assigned_to,
       :gate_one,
       :gate_two,
+      :training_examples,
       { comments: :author },
       { events: :actor },
       { ticket_commits: :author }
     ).find(params[:id])
     @ticket_policy = ticket_policy(@ticket)
-    @new_comment = @ticket.comments.build
+    @new_comment = TicketComment.new(ticket_id: @ticket.id)
     @new_ticket_commit = TicketCommit.new(ticket_id: @ticket.id)
+    @latest_training_example = @ticket.latest_training_example
     @event_filter = normalized_event_filter
     @event_order = normalized_order_param(params[:event_order], default: "newest")
     @comment_order = normalized_order_param(params[:comment_order], default: "newest")

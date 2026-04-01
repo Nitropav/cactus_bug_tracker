@@ -1,0 +1,138 @@
+<% content_for :title, "Training example" %>
+
+<main class="page">
+  <section class="hero-banner hero-banner--ticket">
+    <div>
+      <div class="hero-banner__eyebrow">Training pipeline</div>
+      <h1><%= @training_example.title %></h1>
+      <p class="page-subtitle"><%= @training_example.metadata["ticket_summary"].presence || "No summary captured on the ticket." %></p>
+
+      <div class="hero-banner__meta">
+        <span class="status-pill status-pill--<%= @training_example.status_pending_review? ? "needs_review" : "resolved" %>"><%= @training_example.display_status %></span>
+        <span class="mini-ticket__domain">Ticket BT-<%= @training_example.ticket_id.to_s.rjust(4, "0") %></span>
+        <span class="mini-ticket__domain">Domain: <%= @training_example.metadata["domain"].to_s.humanize %></span>
+      </div>
+    </div>
+
+    <div class="hero-banner__actions">
+      <%= link_to "All examples", training_examples_path, class: "button button--secondary" %>
+      <%= link_to "Source ticket", ticket_path(@training_example.ticket), class: "button" %>
+      <% if training_example_policy(@training_example).export? %>
+        <%= link_to "Export approved JSONL", export_training_examples_path, class: "button button--secondary" %>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="detail-grid detail-grid--three-up ticket-section-gap">
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Status</div>
+      <h2>Review state</h2>
+      <dl class="detail-list">
+        <dt>Status</dt>
+        <dd><%= @training_example.display_status %></dd>
+        <dt>Generated</dt>
+        <dd><%= @training_example.generated_timestamp.strftime("%Y-%m-%d %H:%M") %></dd>
+        <dt>Reviewed by</dt>
+        <dd><%= @training_example.reviewed_by&.name || "Not reviewed yet" %></dd>
+        <dt>Reviewed at</dt>
+        <dd><%= @training_example.reviewed_at ? @training_example.reviewed_at.strftime("%Y-%m-%d %H:%M") : "Not reviewed yet" %></dd>
+        <dt>Last exported</dt>
+        <dd><%= @training_example.exported_at ? @training_example.exported_at.strftime("%Y-%m-%d %H:%M") : "Not exported yet" %></dd>
+      </dl>
+    </article>
+
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Ticket</div>
+      <h2>Source metadata</h2>
+      <dl class="detail-list">
+        <dt>Ticket status</dt>
+        <dd><%= @training_example.source_ticket_status.to_s.humanize %></dd>
+        <dt>Severity</dt>
+        <dd><%= @training_example.metadata["severity"].to_s.humanize %></dd>
+        <dt>External reference</dt>
+        <dd><%= @training_example.metadata["external_reference"].presence || "None" %></dd>
+      </dl>
+    </article>
+
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Evidence</div>
+      <h2>Implementation links</h2>
+      <dl class="detail-list">
+        <dt>Commit SHAs</dt>
+        <dd><%= @training_example.commit_shas.presence&.join(", ") || "None" %></dd>
+        <dt>PR URLs</dt>
+        <dd><%= @training_example.pull_request_urls.size %></dd>
+        <dt>Comments captured</dt>
+        <dd><%= @training_example.metadata["comment_count"] %></dd>
+      </dl>
+    </article>
+  </section>
+
+  <% if training_example_policy(@training_example).approve? || training_example_policy(@training_example).reject? %>
+    <section class="detail-grid detail-grid--two-up ticket-section-gap">
+      <article class="detail-card detail-card--soft">
+        <div class="detail-card__eyebrow">Review action</div>
+        <h2>Approve example</h2>
+        <p class="detail-card__description">Approve this draft when it is ready to enter the verified corpus.</p>
+        <%= form_with model: @training_example, url: approve_training_example_path(@training_example), method: :patch, class: "ticket-form ticket-form--compact" do |form| %>
+          <div class="field">
+            <%= form.label :review_notes, "Review notes (optional)" %>
+            <%= form.text_area :review_notes, rows: 4, placeholder: "Why this example is ready for export." %>
+          </div>
+          <div class="ticket-form__actions">
+            <%= form.submit "Approve example", class: "button" %>
+          </div>
+        <% end %>
+      </article>
+
+      <article class="detail-card detail-card--soft">
+        <div class="detail-card__eyebrow">Review action</div>
+        <h2>Reject example</h2>
+        <p class="detail-card__description">Reject the draft when the ticket data is not strong enough yet or needs correction.</p>
+        <%= form_with model: @training_example, url: reject_training_example_path(@training_example), method: :patch, class: "ticket-form ticket-form--compact" do |form| %>
+          <div class="field">
+            <%= form.label :review_notes, "Rejection notes" %>
+            <%= form.text_area :review_notes, rows: 4, placeholder: "What is missing or incorrect in the draft." %>
+          </div>
+          <div class="ticket-form__actions">
+            <%= form.submit "Reject example", class: "button button--secondary" %>
+          </div>
+        <% end %>
+      </article>
+    </section>
+  <% end %>
+
+  <section class="detail-grid detail-grid--stacked ticket-section-gap">
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Gate 1</div>
+      <h2>Problem side</h2>
+      <div class="read-only-stack">
+        <div class="read-only-value read-only-value--multiline"><%= @training_example.problem_description.presence || "No problem description recorded." %></div>
+        <div class="read-only-value read-only-value--multiline"><strong>Reproduction:</strong><br><%= simple_format(@training_example.reproduction_steps.presence || "No repro steps recorded.") %></div>
+        <div class="read-only-value read-only-value--multiline"><strong>Expected:</strong><br><%= simple_format(@training_example.expected_behavior.presence || "No expected behavior recorded.") %></div>
+        <div class="read-only-value read-only-value--multiline"><strong>Actual:</strong><br><%= simple_format(@training_example.actual_behavior.presence || "No actual behavior recorded.") %></div>
+        <div class="read-only-value read-only-value--multiline"><strong>Environment:</strong><br><%= simple_format(@training_example.environment_context.presence || "No environment context recorded.") %></div>
+      </div>
+    </article>
+
+    <article class="detail-card detail-card--soft">
+      <div class="detail-card__eyebrow">Gate 2</div>
+      <h2>Resolution side</h2>
+      <div class="read-only-stack">
+        <div class="read-only-value read-only-value--multiline"><strong>Root cause:</strong><br><%= simple_format(@training_example.root_cause.presence || "No root cause recorded.") %></div>
+        <div class="read-only-value read-only-value--multiline"><strong>Fix summary:</strong><br><%= simple_format(@training_example.fix_summary.presence || "No fix summary recorded.") %></div>
+        <div class="read-only-value read-only-value--multiline"><strong>Verification:</strong><br><%= simple_format(@training_example.verification_steps.presence || "No verification steps recorded.") %></div>
+      </div>
+    </article>
+
+    <% if @training_example.review_notes.present? %>
+      <article class="detail-card detail-card--soft">
+        <div class="detail-card__eyebrow">Reviewer notes</div>
+        <h2>Decision context</h2>
+        <div class="read-only-stack">
+          <div class="read-only-value read-only-value--multiline"><%= simple_format(@training_example.review_notes) %></div>
+        </div>
+      </article>
+    <% end %>
+  </section>
+</main>

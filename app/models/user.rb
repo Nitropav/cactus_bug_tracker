@@ -36,6 +36,11 @@ class User < ApplicationRecord
            foreign_key: :author_id,
            inverse_of: :author,
            dependent: :nullify
+  has_many :reviewed_training_examples,
+           class_name: "TrainingExample",
+           foreign_key: :reviewed_by_id,
+           inverse_of: :reviewed_by,
+           dependent: :nullify
   has_many :user_events, dependent: :destroy, inverse_of: :user
   has_many :acted_user_events,
            class_name: "UserEvent",

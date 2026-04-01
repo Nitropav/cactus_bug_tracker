@@ -1,0 +1,63 @@
+<% content_for :title, "Training examples" %>
+
+<main class="page">
+  <section class="hero-banner hero-banner--ticket">
+    <div>
+      <div class="hero-banner__eyebrow">Training pipeline</div>
+      <h1>Training examples</h1>
+      <p class="page-subtitle">Resolved tickets are converted into structured draft examples ready for review and later export.</p>
+
+      <div class="hero-banner__meta">
+        <span class="list-pill"><strong><%= @training_examples.count %></strong> visible</span>
+        <span class="mini-ticket__domain">Approved: <%= @approved_count %></span>
+        <span class="mini-ticket__domain">Statuses: <%= TrainingExample.statuses.keys.map(&:humanize).join(", ") %></span>
+      </div>
+    </div>
+
+    <div class="hero-banner__actions">
+      <%= link_to "Export approved JSONL", export_training_examples_path, class: "button" %>
+    </div>
+  </section>
+
+  <section class="surface ticket-section-gap">
+    <div class="feed-toolbar">
+      <div class="feed-toolbar__group">
+        <%= link_to "All", training_examples_path, class: "filter-chip #{'filter-chip--active' if @status_filter.blank?}" %>
+        <% TrainingExample.statuses.keys.each do |status| %>
+          <%= link_to status.humanize, training_examples_path(status: status), class: "filter-chip #{'filter-chip--active' if @status_filter == status}" %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @training_examples.any? %>
+      <div class="user-directory">
+        <% @training_examples.each do |training_example| %>
+          <article class="user-card">
+            <div class="user-card__identity">
+              <div>
+                <div class="user-card__name"><%= training_example.title %></div>
+                <div class="user-card__email">Ticket BT-<%= training_example.ticket_id.to_s.rjust(4, "0") %> | <%= training_example.metadata["domain"].to_s.humanize %></div>
+              </div>
+            </div>
+
+            <div class="user-card__meta">
+              <span class="status-pill status-pill--<%= training_example.status_pending_review? ? "needs_review" : "resolved" %>"><%= training_example.display_status %></span>
+              <span class="detail-muted">Generated: <%= training_example.generated_timestamp.strftime("%Y-%m-%d %H:%M") %></span>
+              <span class="detail-muted">Source status: <%= training_example.source_ticket_status.to_s.humanize %></span>
+              <span class="detail-muted">Exported: <%= training_example.exported_at ? training_example.exported_at.strftime("%Y-%m-%d %H:%M") : "Not yet" %></span>
+            </div>
+
+            <div class="user-card__actions">
+              <%= link_to "Open", training_example_path(training_example), class: "button button--secondary button--small" %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <h2>No training examples yet</h2>
+        <p>Move a ticket into <code>resolved</code> or <code>closed</code> and the draft example will be generated automatically.</p>
+      </div>
+    <% end %>
+  </section>
+</main>
